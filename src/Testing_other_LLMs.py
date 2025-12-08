@@ -13,8 +13,8 @@ from sklearn.metrics import confusion_matrix, classification_report
 import re
 from collections import Counter
 import torch.nn.functional as F
-from Testing_gemma_7b_categorization import parse_generated_output_to_get_category
-from Testing_gemma_2b_categorization  import identify_test_category
+#from Testing_gemma_7b_categorization import parse_generated_output_to_get_category
+#from Testing_gemma_2b_categorization  import identify_test_category
 import transformers
 import torch
 
@@ -42,6 +42,39 @@ def categories_defination_and_tokenizers_max_length():
 
     MAX_LENGTH = 2048  # Or 8192, based on your model
     return categories, MAX_LENGTH 
+
+def prompt_definition():
+    definitions = f"""You are an expert at identifying flaky tests and analyzing their type. Flaky tests are tests that pass and fail non-deterministically for the same code. You are given a test, and you have to check whether it is flaky or not. If it is flaky, you have to identify the type of flakiness and classify into one of the following categories or just say Not Flaky: 
+    1. Async wait: The test execution makes an asynchronous call and does not properly wait for the result of the call to be available before proceeding. This can lead to non-deterministic test outcomes. 
+    2. Concurrency: Test non-determinism is due to different threads interacting in a non-desirable manner (but not due to asynchronous calls from the Async Wait category), e.g., due to data races, atomicity violations, or deadlocks. 
+    3. Time: Relying on the system time introduces non-deterministic failures, e.g., a test may fail when the midnight changes in the UTC time zone. Some tests also fail due to the precision by which time is reported as it can vary from one platform to another. 
+    4. Unordered collection: In general, when iterating over unordered collections (e.g., sets), the code should not assume that the elements are returned in a particular order. If it does assume, the test outcome can become non-deterministic as different executions may have a different order.
+    5. Test Order dependent test: The test depends on the order of execution of other tests. If the order changes, the test outcome may change. 
+    6. Not Flaky: The test is not flaky due to the above reasons."""
+    return definitions
+
+def parse_generated_output_to_get_category(output_text):
+    # Find all occurrences of "Category:"
+    matches = re.findall(r"Category:\s*([^\n]*)", output_text)
+    
+    if matches:
+        output_category = matches[-1].strip()  # Take the last occurrence
+        output_category = re.sub(r"^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$", "", output_category)  # Remove non-alphanumeric chars at start/end
+        #output_category = re.sub(r"^\s+", "", output_category)  # Explicitly remove leading spaces
+        #output_category = output_category.replace("\xa0", "").replace("\u200b", "")
+
+
+        #output_category = output_category.lstrip()  # Take the last occurrence
+    else:
+        output_category = "Unknown"
+
+    print(len(output_category))  # Should be the exact length of "Concurrency" (11)
+    print(repr(output_category))  # To see hidden characters
+    print(f">>>{output_category}<<<")  # This will show if there are hidden spaces
+
+    print("*****Extracted Category:",output_category)
+    
+    return output_category 
 
 def give_test_data_in_chunks_codellama(x_test_nparray, tokenizer, model, batch_size, device, fold, y_test_nparray, ml_technique): #BERT
     x_test_df = pd.DataFrame(x_test_nparray)
@@ -95,7 +128,7 @@ The possible categories are:
 - Time
 - Unordered collection
 - Order dependent test
-- Not flaky
+- Not Flaky
 
 Here are some labeled examples:
 
@@ -218,17 +251,10 @@ def give_test_data_in_chunks_deep_seek_coder(x_test_nparray, tokenizer, model, b
     #for index, row in x_test_df.iterrows():
     for index, (test_data, actual_label) in enumerate(zip(x_test_df['full_code'], y_test_df['category'])):
         print("****fold=", fold)
-        definitions = f"""You are an expert at identifying flaky tests and analyzing their type. Flaky tests are tests that pass and fail non-deterministically for the same code. You are given a test, and you have to check whether it is flaky or not. If it is flaky, you have to identify the type of flakiness and classify into one of the following categories or just say Not Flaky: 
-        1. Async wait: The test execution makes an asynchronous call and does not properly wait for the result of the call to be available before proceeding. This can lead to non-deterministic test outcomes. 
-        2. Concurrency: Test non-determinism is due to different threads interacting in a non-desirable manner (but not due to asynchronous calls from the Async Wait category), e.g., due to data races, atomicity violations, or deadlocks. 
-        3. Time: Relying on the system time introduces non-deterministic failures, e.g., a test may fail when the midnight changes in the UTC time zone. Some tests also fail due to the precision by which time is reported as it can vary from one platform to another. 
-        4. Unordered collection: In general, when iterating over unordered collections (e.g., sets), the code should not assume that the elements are returned in a particular order. If it does assume, the test outcome can become non-deterministic as different executions may have a different order.
-        5. Test Order dependent test: The test depends on the order of execution of other tests. If the order changes, the test outcome may change. 
-        6. Not Flaky: The test is not flaky due to the above reasons."""
-        #test_data = row['full_code']
+        definitions = prompt_definition()
 
         prompt = f"""
-Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or non-flaky.
+Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or not flaky.
 
 Here are some leveled examples:
 {examples}
@@ -244,38 +270,8 @@ Test:
 """
 
         messages = [
-            #{"role": "system", "content": definitions},
             {"role": "user", "content": prompt}
         ]
-        #model_inputs = tokenizer.apply_chat_template(messages, return_tensors="pt", padding=True,  max_length=MAX_LENGTH, truncation=True).to(model.device)
-        '''model_inputs = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).to(model.device)
-
-        #formatted_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        #model_inputs = tokenizer(formatted_prompt, return_tensors="pt", padding=True, max_length=MAX_LENGTH, truncation=True).to(model.device)
-
-
-        input_ids = model_inputs["input_ids"]
-        attention_mask = model_inputs["attention_mask"]
-        # tokenizer.eos_token_id is the id of <｜end▁of▁sentence｜>  token
-        outputs = model.generate(
-            #model_inputs, 
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            #**model_inputs,
-            max_new_tokens=10, 
-            do_sample=False, 
-            top_k=50, 
-            top_p=0.95, 
-            temperature=0.0,
-            num_return_sequences=1, 
-            pad_token_id=tokenizer.pad_token_id,  # Set pad_token_id explicitly
-            eos_token_id=tokenizer.eos_token_id
-            #output_attentions=True  # Capture attention weights
-        )
-        #input_len = model_inputs["input_ids"].shape[1]
-        #output_tokens = outputs[0][input_len:]
-
-        category = tokenizer.decode(outputs[0][len(model_inputs[0]):], skip_special_tokens=True).strip()'''
         inputs = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).to(model.device)
 
         input_ids = inputs["input_ids"]
@@ -328,10 +324,6 @@ Test:
         #Calculating IG
         top_token_list = "" #collect_token_list_by_applying_ig(model_inputs, prompt, tokenizer, model, test_data, ml_technique)
 
-        # Print only the tokens (no scores)
-        #print("\n Top-20 Tokens Based on Attribution Scores:")
-        #print(top_token_list)
-
         category_value = categories.get(output_category_lower, 6)  # Return -1 if category not found
         print('category_value=')
         print(category_value)
@@ -346,9 +338,6 @@ Test:
         else:
             category_token_map[category_value] = []  # Store empty list for large test cases
 
-        #print("\nFinal Category-Token Map:", category_token_map)
-        #exit()
-    #return total_preds, category_token_map
     return total_preds, category_token_map, top_tokens_per_test
 
 def give_test_data_in_chunks_llama3_8b(x_test_nparray, tokenizer, model, batch_size, device, fold, y_test_nparray, ml_technique):
@@ -369,42 +358,8 @@ def give_test_data_in_chunks_llama3_8b(x_test_nparray, tokenizer, model, batch_s
     y_test_df = pd.DataFrame(y_test_nparray, columns=['category'])  # Convert to DataFrame
     #for index, row in x_test_df.iterrows():
     for index, (test_data, actual_label) in enumerate(zip(x_test_df['full_code'], y_test_df['category'])):
-        #test_data = row['full_code']
-        #prompt = f"""
-        #Classify the given test as one of the following categories: **Async wait, Concurrency, Time, Unordered collection, Order dependent test, or Not Flaky**.
-        #
-        #**Test:**
-        #{test_data}                        
-        #
-        #**Output Format (MUST follow this format exactly):**
-        #```
-        #Category: <one of the six categories above>
-        #Tokens: ["token1", "token2", "token3", "token4", "token5"]
-        #```
-        #
-        #**Important Rules:**
-        #- Category: Choose exactly one from the given list.
-        #- Tokens:
-        #    - Provide exactly **5 tokens**.
-        #    - Each token must be **a single atomic unit** (one word, number, or symbol).
-        #    - **Do NOT include dots (`.`), spaces, or compound words**.  
-        #    - **Example of valid tokens:** `"Thread"`, `"sleep"`, `"1000"`, `";"`, `"wait"`  
-        #    - **Example of INVALID tokens (DO NOT use these!):** `"Thread.sleep"`, `"e.execute"`, `"this.method"`, `"Thread start"`
-
-        #**Example of Expected Output:**
-        #```
-        #Category: Concurrency
-        #Tokens: ["Thread", "lock", "synchronized", "race", "volatile"]
-        #```
-
-        #**Example of INVALID Output (DO NOT produce this format!):**
-        #```
-        #Category: Concurrency
-        #Tokens: ["Thread.sleep", "e.execute", "Thread.start", "race condition", "lock()"]
-        #```
-        #"""
         prompt = f"""
-        Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or non-flaky.
+        Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or not flaky.
 
         Think step by step to determine the most appropriate category.
 
@@ -416,13 +371,7 @@ def give_test_data_in_chunks_llama3_8b(x_test_nparray, tokenizer, model, batch_s
         ``` 
         """
 
-        definitions = f"""You are an expert at identifying flaky tests and analyzing their type. Flaky tests are tests that pass and fail non-deterministically for the same code. You are given a test, and you have to check whether it is flaky or not. If it is flaky, you have to identify the type of flakiness and classify into one of the following categories or just say Not Flaky: 
-        1. Async wait: The test execution makes an asynchronous call and does not properly wait for the result of the call to be available before proceeding. This can lead to non-deterministic test outcomes. 
-        2. Concurrency: Test non-determinism is due to different threads interacting in a non-desirable manner (but not due to asynchronous calls from the Async Wait category), e.g., due to data races, atomicity violations, or deadlocks. 
-        3. Time: Relying on the system time introduces non-deterministic failures, e.g., a test may fail when the midnight changes in the UTC time zone. Some tests also fail due to the precision by which time is reported as it can vary from one platform to another. 
-        4. Unordered collection: In general, when iterating over unordered collections (e.g., sets), the code should not assume that the elements are returned in a particular order. If it does assume, the test outcome can become non-deterministic as different executions may have a different order. 
-        5. Test Order dependent test: The test depends on the order of execution of other tests. If the order changes, the test outcome may change. 
-        6. Not Flaky: The test is not flaky due to the above reasons."""
+        definitions = prompt_definition() 
 
         messages = [
         {"role": "system", "content": definitions}, #I can specify the output format as the json
@@ -438,7 +387,6 @@ def give_test_data_in_chunks_llama3_8b(x_test_nparray, tokenizer, model, batch_s
 
         text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
-        # ✅ Use tokenizer correctly to return a dictionary
         model_inputs = tokenizer(text, return_tensors="pt", max_length=MAX_LENGTH, truncation=True)
 
 
@@ -446,25 +394,10 @@ def give_test_data_in_chunks_llama3_8b(x_test_nparray, tokenizer, model, batch_s
             tokenizer.eos_token_id,
             tokenizer.convert_tokens_to_ids("<|eot_id|>")
         ]
-        # Move inputs to the same device as the model
-        # ✅ Ensure it's a dictionary and move to model's device
-        #if isinstance(model_inputs, dict):  
-        #    model_inputs = {key: value.to(model.device) for key, value in model_inputs.items()}
-        #else:
-        #    raise TypeError("Tokenizer output is not a dictionary, check tokenizer settings!")
-        # ✅ Check and fix if tokenizer is returning a tensor instead of a dict
-        #if not isinstance(model_inputs, dict):
-        #    raise TypeError(f"Tokenizer output is {type(model_inputs)}, expected a dictionary!")
-        # ✅ Convert BatchEncoding to dictionary
         if isinstance(model_inputs, transformers.tokenization_utils_base.BatchEncoding):
             model_inputs = dict(model_inputs)  # Explicitly convert to dictionary
-
         
-        # ✅ Move inputs to model's device
         model_inputs = {key: value.to(model.device) for key, value in model_inputs.items()}
-
-
-        #model_inputs = {key: value.to(model.device) for key, value in model_inputs.items()}
 
         outputs = model.generate(
             **model_inputs,
@@ -488,13 +421,6 @@ def give_test_data_in_chunks_llama3_8b(x_test_nparray, tokenizer, model, batch_s
         output_category_lower = category.lower()
         #Calculating IG
         top_token_list = "" #collect_token_list_by_applying_ig(model_inputs, prompt, tokenizer, model, test_data, ml_technique)
-
-        # Print only the tokens (no scores)
-        #print("\n✅ Top-20 Tokens Based on Attribution Scores:")
-        #print(top_token_list)
-        #Storing tokens for each category test 
-        #category = parse_category_and_token_list(output_category)
-
         category_value = categories.get(output_category_lower, 6)  # Return -1 if category not found
         print('category_value=')
         print(category_value)
@@ -508,20 +434,6 @@ def give_test_data_in_chunks_llama3_8b(x_test_nparray, tokenizer, model, batch_s
             category_token_map[category_value].extend(top_token_list)  # Append tokens for the category
         else:
             category_token_map[category_value] = []  # Store empty list for large test cases
-
-        #print("\nFinal Category-Token Map:", category_token_map)
-    
-        #total_preds.append(category_value)
-        #top_tokens_per_test.append(tokens)
-
-        ## Store tokens in dictionary
-        ##if category_value != -1:  # Valid category
-
-        #if category_value == actual_label:
-        #    if category_value not in category_token_map:
-        #        category_token_map[category_value] = []  # Initialize empty list if not exists
-        #    category_token_map[category_value].extend(tokens)  # Append tokens for the category
-        #    print("\nFinal Category-Token Map:", category_token_map)
 
     return total_preds, category_token_map, top_tokens_per_test
 
@@ -549,7 +461,7 @@ def give_test_data_in_chunks_codegemma(x_test_nparray, tokenizer, model, batch_s
         test_data = row['full_code']
 
         prompt = f"""
-        Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or non-flaky.
+        Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or not flaky.
 
         Think step by step to determine the most appropriate category.
 
@@ -560,23 +472,12 @@ def give_test_data_in_chunks_codegemma(x_test_nparray, tokenizer, model, batch_s
         Category: <one of the six categories above>
         ``` 
         """
-        definitions = f"""You are an expert at identifying flaky tests and analyzing their type. Flaky tests are tests that pass and fail non-deterministically for the same code. You are given a test, and you have to check whether it is flaky or not. If it is flaky, you have to identify the type of flakiness and classify into one of the following categories or just say Not Flaky: 
-        1. Async wait: The test execution makes an asynchronous call and does not properly wait for the result of the call to be available before proceeding. This can lead to non-deterministic test outcomes. 
-        2. Concurrency: Test non-determinism is due to different threads interacting in a non-desirable manner (but not due to asynchronous calls from the Async Wait category), e.g., due to data races, atomicity violations, or deadlocks. 
-        3. Time: Relying on the system time introduces non-deterministic failures, e.g., a test may fail when the midnight changes in the UTC time zone. Some tests also fail due to the precision by which time is reported as it can vary from one platform to another. 
-        4. Unordered collection: In general, when iterating over unordered collections (e.g., sets), the code should not assume that the elements are returned in a particular order. If it does assume, the test outcome can become non-deterministic as different executions may have a different order. 
-        5. Test Order dependent test: The test depends on the order of execution of other tests. If the order changes, the test outcome may change. 
-        6. Not Flaky: The test is not flaky due to the above reasons."""
+        definitions = prompt_definition 
+
         text = [
         #{"role": "system", "content": definitions}, #I can specify the output format as the json
         {"role": "user", "content": prompt},
         ]
-       
-        #input_ids = tokenizer.apply_chat_template(
-        #    messages,
-        #    add_generation_prompt=True,
-        #    return_tensors="pt"
-        #).to(model.device)
 
         model_inputs = tokenizer.apply_chat_template(text, return_tensors="pt",
             max_length=MAX_LENGTH,  # Truncate long inputs
@@ -598,7 +499,7 @@ def give_test_data_in_chunks_codegemma(x_test_nparray, tokenizer, model, batch_s
             do_sample=False,
             temperature=0.8,
             return_dict_in_generate=True,  # Return full output including attention
-            output_attentions=True  # Capture attention weights
+            output_attentions= False #True  # Capture attention weights
         )
 
         #response = outputs[0][model_inputs.shape[-1]:]
@@ -662,8 +563,8 @@ def give_test_data_in_chunks_gemma2b(x_test_nparray, tokenizer, model, batch_siz
         #while True:
         #output_category_lower = identify_test_category(test_data, tokenizer, model, device)
 
-        category_list=["Async-wait", "Concurrency", "Time", "Unordered-collection", "Order-dependent", "non-flaky"]
-        prompt=f"""Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or non-flaky.        
+        category_list=["Async-wait", "Concurrency", "Time", "Unordered-collection", "Order-dependent", "not flaky"]
+        prompt=f"""Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or not flaky.        
 
         Think step by step to determine the most appropriate category.
 
@@ -750,15 +651,10 @@ def give_test_data_in_chunks_gemma7b(x_test_nparray, tokenizer, model, batch_siz
         The output should be only the category name
         CATEGORY:"""
 
-        definitions = f"""You are an expert at identifying flaky tests and analyzing their type. Flaky tests are tests that pass and fail non-deterministically for the same code. You are given a test, and you have to check whether it is flaky or not. If it is flaky, you have to identify the type of flakiness and classify into one of the following categories or just say Not Flaky: 
-        1. Async wait: The test execution makes an asynchronous call and does not properly wait for the result of the call to be available before proceeding. This can lead to non-deterministic test outcomes. 
-        2. Concurrency: Test non-determinism is due to different threads interacting in a non-desirable manner (but not due to asynchronous calls from the Async Wait category), e.g., due to data races, atomicity violations, or deadlocks. 
-        3. Time: Relying on the system time introduces non-deterministic failures, e.g., a test may fail when the midnight changes in the UTC time zone. Some tests also fail due to the precision by which time is reported as it can vary from one platform to another. 
-        4. Unordered collection: In general, when iterating over unordered collections (e.g., sets), the code should not assume that the elements are returned in a particular order. If it does assume, the test outcome can become non-deterministic as different executions may have a different order. 
-        5. Test Order dependent test: The test depends on the order of execution of other tests. If the order changes, the test outcome may change. 
-        6. Not Flaky: The test is not flaky due to the above reasons."""
+        definitions = prompt_definition()
+
         prompt = f"""
-        Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or non-flaky.
+        Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or not flaky.
 
         Think step by step to determine the most appropriate category.
 
@@ -769,62 +665,24 @@ def give_test_data_in_chunks_gemma7b(x_test_nparray, tokenizer, model, batch_siz
         Category: <one of the six categories above>
         ``` 
         """
-        #prompt = f"""
-        #Classify the given test as one of the following categories: **Async wait, Concurrency, Time, Unordered collection, Order dependent test, or Not Flaky**.
-        #
-        #**Test:**
-        #{test_data}                        
-        #
-        #**Output Format (MUST follow this format exactly):**
-        #```
-        #Category: <one of the six categories above>
-        #Tokens: ["token1", "token2", "token3", "token4", "token5"]
-        #```
-        #
-        #**Important Rules:**
-        #- **Category**: Choose exactly one from the given list.
-        #- **Tokens**:
-        #    - Provide exactly **5 tokens**.
-        #    - Each token must be **a single atomic unit** (one word, number, or symbol).
-        #    - **Do NOT include dots (`.`), spaces, or compound words**.  
-        #    - **Example of valid tokens:** `"Thread"`, `"sleep"`, `"1000"`, `";"`, `"wait"`  
-        #    - **Example of INVALID tokens (DO NOT use these!):** `"Thread.sleep"`, `"e.execute"`, `"this.method"`, `"Thread start"`
-
-        #**Example of Expected Output:**
-        #```
-        #Category: Concurrency
-        #Tokens: ["Thread", "lock", "synchronized", "race", "volatile"]
-        #```
-
-        #**Example of INVALID Output (DO NOT produce this format!):**
-        #```
-        #Category: Concurrency
-        #Tokens: ["Thread.sleep", "e.execute", "Thread.start", "race condition", "lock()"]
-        #```
-        #"""
-        '''input_ids = tokenizer(prompt, return_tensors="pt").to(model.device)
-        outputs = model.generate(**input_ids, max_new_tokens=100)
-        output_category = tokenizer.decode(outputs[0], skip_special_tokens=True)'''
-
-        '''model_inputs = tokenizer(prompt, return_tensors="pt", max_length=MAX_LENGTH, truncation=True).to(model.device)
-        outputs = model.generate(**model_inputs, max_new_tokens=15, return_dict_in_generate=True, output_attentions=True)
-        output_category = tokenizer.decode(outputs["sequences"][0], skip_special_tokens=True)'''
         model_inputs = tokenizer(prompt, return_tensors="pt", max_length=MAX_LENGTH, truncation=True).to(model.device)
 
         outputs = model.generate(
             **model_inputs,
-            max_new_tokens=50,
+            max_new_tokens=100,
             eos_token_id=tokenizer.eos_token_id,
             do_sample=False,
             temperature=0.3,
             return_dict_in_generate=True,
-            output_attentions=True
+            output_attentions=False
         ) 
 
         output_text = tokenizer.decode(outputs["sequences"][0], skip_special_tokens=True)
         #print(output_text)
         output_category = parse_generated_output_to_get_category(output_text)
-        print("category_output=", output_category)
+        #print("category_output=", output_category)
+
+
 
         #NEW PART
         #Calculating IG
@@ -854,32 +712,6 @@ def give_test_data_in_chunks_gemma7b(x_test_nparray, tokenizer, model, batch_siz
         #exit()
 
     return total_preds, category_token_map, top_tokens_per_test
-
-
-
-    '''     flag = False
-        category, tokens = parse(output_category)
-        print("Extracted Category:", category)
-        print("Extracted Tokens:", tokens)
-
-        #output_category_lower = output_category.lower()
-        category_value = categories.get(category.lower().strip(), 6)  # Return -1 if category not found
-        print(category_value)
-    
-        total_preds.append(category_value)
-        top_tokens_per_test.append(tokens)
-
-        # Store tokens in dictionary
-        #if category_value != -1:  # Valid category
-
-        if category_value == actual_label:
-            if category_value not in category_token_map:
-                category_token_map[category_value] = []  # Initialize empty list if not exists
-            category_token_map[category_value].extend(tokens)  # Append tokens for the category
-            print("\nFinal Category-Token Map:", category_token_map)
-        #exit()
-
-    return total_preds, category_token_map, top_tokens_per_test'''
 
 def collect_token_list_by_applying_ig(model_inputs, prompt, tokenizer, model, test_data, ml_technique):
     if ml_technique == "codegemma":
@@ -932,7 +764,7 @@ def give_test_data_in_chunks_qwen(x_test_nparray, tokenizer, model, batch_size, 
 
         # Define the prompt and the input for classification
         prompt = f"""
-Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or non-flaky.
+Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or not flaky.
 
 Below are some examples:
 
@@ -946,53 +778,7 @@ Test:
 Category: <one of the six categories above>
 ```
 """
-        #prompt = f"""
-        #Classify the given test as one of the following categories: **Async wait, Concurrency, Time, Unordered collection, Order dependent test, or Not Flaky**.
-        #
-        #**Test:**
-        #{test_data}                        
-        #
-        #**Output Format (MUST follow this format exactly):**
-        #```
-        #Category: <one of the six categories above>
-        #Tokens: ["token1", "token2", "token3", "token4", "token5"]
-        #```
-        #
-        #**Important Rules:**
-        #- **Category**: Choose exactly one from the given list.
-        #- **Tokens**:
-        #    - Provide exactly **5 tokens**.
-        #    - Each token must be **a single atomic unit** (one word, number, or symbol).
-        #    - **Do NOT include dots (`.`), spaces, or compound words**.  
-        #    - **Example of valid tokens:** `"Thread"`, `"sleep"`, `"1000"`, `";"`, `"wait"`  
-        #    - **Example of INVALID tokens (DO NOT use these!):** `"Thread.sleep"`, `"e.execute"`, `"this.method"`, `"Thread start"`
-
-        #**Example of Expected Output:**
-        #```
-        #Category: Concurrency
-        #Tokens: ["Thread", "lock", "synchronized", "race", "volatile"]
-        #```
-
-        #**Example of INVALID Output (DO NOT produce this format!):**
-        #```
-        #Category: Concurrency
-        #Tokens: ["Thread.sleep", "e.execute", "Thread.start", "race condition", "lock()"]
-        #```
-        #"""
-        #print(prompt)
-        #exit()
-        #input_str = prompt + test_data
-        #definitions = "You are an expert at identifying flaky tests and analyzing their type. Flaky tests are tests that pass and fail non-deterministically for the same code. You are given a test, and you have to check whether it is flaky or not. If it is flaky, you have to identify the type of flakiness and classify into one of the following categories or just say Not Flaky." 
-        definitions = """You are an expert at identifying flaky tests and analyzing their type. Flaky tests are tests that pass and fail non-deterministically for the same code. You are given a test, and you have to check whether it is flaky or not. If it is flaky, you have to identify the type of flakiness and classify into one of the following categories or just say Not Flaky: 
-        1. Async wait: The test execution makes an asynchronous call and does not properly wait for the result of the call to be available before proceeding. This can lead to non-deterministic test outcomes. 
-        2. Concurrency: Test non-determinism is due to different threads interacting in a non-desirable manner (but not due to asynchronous calls from the Async Wait category), e.g., due to data races, atomicity violations, or deadlocks. 
-        3. Time: Relying on the system time introduces non-deterministic failures, e.g., a test may fail when the midnight changes in the UTC time zone. Some tests also fail due to the precision by which time is reported as it can vary from one platform to another. 
-        4. Unordered collection: In general, when iterating over unordered collections (e.g., sets), the code should not assume that the elements are returned in a particular order. If it does assume, the test outcome can become non-deterministic as different executions may have a different order.
-        5. Test Order dependent test: The test depends on the order of execution of other tests. If the order changes, the test outcome may change. 
-        6. Not Flaky: The test is not flaky due to the above reasons."""
-        
-        #definitions = "You are a baby"
-        #prompt="What is 2+2?"       
+        definitions = prompt_definition()
         messages = [
             {"role": "system", "content": definitions},
             {"role": "user", "content": prompt}
@@ -1002,14 +788,10 @@ Category: <one of the six categories above>
                tokenize=False,
                add_generation_prompt=True
         )
-        #print('row_index=', index)
-        #exit()
-        #MAX_LENGTH = 2048  # Or 8192, based on your model
 
         model_inputs = tokenizer([text], return_tensors="pt",
             max_length=MAX_LENGTH,  # Truncate long inputs
                 truncation=True
-
         ).to(model.device)
         #with torch.no_grad():
         outputs = model.generate(
@@ -1019,9 +801,8 @@ Category: <one of the six categories above>
                 do_sample=False,  # Use deterministic sampling
                 temperature=0.8,  # Slightly lower temperature for more focused predictions
                 return_dict_in_generate=True,  # Return full output including attention
-                output_attentions=True  # Capture attention weights
+                output_attentions = False #True  # Capture attention weights
             )
-        #print(outputs.keys())
         generated_ids = [
             output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, outputs.sequences)
         ]
@@ -1031,10 +812,6 @@ Category: <one of the six categories above>
         #Calculating IG
         top_token_list = "" #collect_token_list_by_applying_ig(model_inputs, prompt, tokenizer, model, test_data, ml_technique)
 
-        # Print only the tokens (no scores)
-        #print("\n✅ Top-20 Tokens Based on Attribution Scores:")
-        #print(top_token_list)
-        #Storing tokens for each category test 
         category = parse_category_and_token_list(output_category)
         category_value = categories.get(category.lower().strip(), 6)  # Return -1 if category not found
         print(category_value)
@@ -1054,13 +831,6 @@ Category: <one of the six categories above>
 
     return total_preds, category_token_map, top_tokens_per_test
 
-        # Check if the output matches any category
-        #for category, value in categories.items():
-        #    if output_category_lower == category:
-        #        total_preds.append(value)
-        #        break
-   
-    #return total_preds
 
 def run_experiment(dataset_path, model_weights_path, results_file, data_name_dir, technique):
     device, ml_technique, dataset_category, output_layer, where_data_comes = init_setup(technique, data_name_dir)
