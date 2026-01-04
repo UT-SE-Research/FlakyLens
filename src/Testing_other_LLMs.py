@@ -114,97 +114,71 @@ def give_test_data_in_chunks_codellama(x_test_nparray, tokenizer, model, batch_s
         #test_data = row['full_code']
         #prompt = "What is the category of the given test? Is it Async wait or Concurrency or Time or Unordered collection or Order dependent test or non-flaky? \n" 
         #input_str = prompt + test_data 
-        category_list=["Async-wait", "Concurrency", "Time", "Unordered-collection", "Order-dependent", "non-flaky"]
-        #template=f"""You will be given a category list and a test. Your task is to identify the category of the given test. Remember you must output ONLY one category at a time for a test. And your category name MUST be within the category list.
+        prompt_body = f"""
+Choose exactly ONE category from:
+Async wait
+Concurrency
+Time
+Unordered collection
+Order dependent test
+Not Flaky
 
-        #Categories:
-        #{category_list}
 
-        #Test:
-        #{test_data}
+Test:
+{test_data}
 
-        #The output must be only one of the category names
-        #CATEGORY:<FILL_ME>"""
-        
-        #template = f"""
-        #Classify the given test as one of the following categories: **Async wait, Concurrency, Time, Unordered collection, Order dependent test, or Not Flaky**.
-        #
-        #**Test:**
-        #{test_data}                        
-        #
-        #**Output Format (MUST follow this format exactly):**
-        #```
-        #Category: <one of the six categories above>
-        #Tokens: ["token1", "token2", "token3", "token4", "token5"]
-        #```
-        #
-        #**Important Rules:**
-        #- **Category**: Choose exactly one from the given list.
-        #- **Tokens**:
-        #    - Provide exactly **5 tokens**.
-        #    - Each token must be **a single atomic unit** (one word, number, or symbol).
-        #    - **Do NOT include dots (`.`), spaces, or compound words**.  
-        #    - **Example of valid tokens:** `"Thread"`, `"sleep"`, `"1000"`, `";"`, `"wait"`  
-        #    - **Example of INVALID tokens (DO NOT use these!):** `"Thread.sleep"`, `"e.execute"`, `"this.method"`, `"Thread start"`
+Return ONLY:
+Category: <label>
+Category:
+"""
+        messages = [
+         {"role": "system", "content": "You are an expert in flaky test classification."},
+         {"role": "user", "content": prompt_body},
+       ]
 
-        #**Example of Expected Output:**
-        #```
-        #Category: Concurrency
-        #Tokens: ["Thread", "lock", "synchronized", "race", "volatile"]
-        #```
-
-        #**Example of INVALID Output (DO NOT produce this format!):**
-        #```
-        #Category: Concurrency
-        #Tokens: ["Thread.sleep", "e.execute", "Thread.start", "race condition", "lock()"]
-        #```
-        #"""
-
-        template = f"""
-        Classify the given test into one of these categories: Async wait, Concurrency, Time, Unordered collection, Order dependent test, or Not Flaky.
-
-        Test:
-        {test_data}
-
-        Based on the description, identify the category and list exactly five significant tokens from the test that influenced your decision. Follow the format below:
-
-        Category: <Your Category Here>
-        """
-        inputs = tokenizer(template, return_tensors="pt")["input_ids"].to(device)
+        prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        '''inputs = tokenizer(template, return_tensors="pt")["input_ids"].to(device)
         #attention_mask = inputs["attention_mask"]
         #generated_ids = model.generate(inputs.input_ids, attention_mask = attention_mask,   pad_token_id=tokenizer.eos_token_id, max_new_tokens=10)
         generated_ids = model.generate(inputs, pad_token_id=tokenizer.eos_token_id, max_new_tokens=250)
 
         #output = tokenizer.batch_decode(generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
-        output = tokenizer.batch_decode(generated_ids[:, inputs.shape[1]:], skip_special_tokens = True)
-        print(output)
-        #exit()
-        #output_categories = output.split("\n")
-        #print(output_categories)
+        output = tokenizer.batch_decode(generated_ids[:, inputs.shape[1]:], skip_special_tokens = True)'''
 
-        '''category, tokens = parse_category_and_tokens(output[0])
-        #output_category = output_categories[0]
-        print('Category_name=',category)
-        print('token=', tokens)
+        # after tokenizer = AutoTokenizer.from_pretrained(...)
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
 
-        category_value = categories.get(category.lower().strip(), 6)  # Return -1 if category not found
-        print(category_value)
-    
-        total_preds.append(category_value)
-    
-        # Store tokens in dictionary
-        #if category_value != -1:  # Valid category
-        if category_value not in category_token_map:
-            category_token_map[category_value] = []  # Initialize empty list if not exists
-        category_token_map[category_value].extend(tokens)  # Append tokens for the category
-        print("\nFinal Category-Token Map:", category_token_map)'''
+        model.config.pad_token_id = tokenizer.pad_token_id  # IMPORTANT
+
+        model_inputs = tokenizer(prompt, return_tensors="pt", max_length=MAX_LENGTH, truncation=True).to(device)
+        # Move inputs to the correct device
+        model_inputs = {key: value.to(device) for key, value in model_inputs.items()}  # Ensure it's a dict
+
+        # Limit tokens to avoid excessive generation
+        outputs = model.generate(
+            **model_inputs,
+            max_new_tokens=40,  # Limit to prevent explanations
+            do_sample=False,
+            eos_token_id=tokenizer.eos_token_id,  # Ensure proper stopping
+            pad_token_id=tokenizer.pad_token_id,
+            return_dict_in_generate=True,  # Return full outputs
+            output_scores=False
+        )
+
+        input_length = model_inputs["input_ids"].shape[1]
+        #gen_ids = outputs.sequences[0, input_length:]
+        output = tokenizer.decode(outputs.sequences[0, input_length:], skip_special_tokens=True)
+        #print("output=", output)
+        print("output_repr=", repr(output))  # <-- ADDED
+        #seq = outputs.sequences[0]
 
         category = parse_category_and_token_list(output)
         tokens = ""
         category_value = categories.get(category.lower().strip(), 6)  # Return -1 if category not found
 
         print(category_value)
-    
+
         total_preds.append(category_value)
 
         # Store tokens in dictionary
