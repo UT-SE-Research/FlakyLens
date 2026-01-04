@@ -700,9 +700,13 @@ def give_test_data_in_chunks_codegemma(x_test_nparray, tokenizer, model, batch_s
     total_tokens = []
     total_preds = []
     vis_data_records_ig = []
+    top_tokens_per_test = []
+    category_token_map = {}  # Dictionary to store tokens per category
     count = 0
-    for index, row in x_test_df.iterrows():
-        test_data = row['full_code']
+    #for index, row in x_test_df.iterrows():
+    y_test_df = pd.DataFrame(y_test_nparray, columns=['category'])  # Convert to DataFrame
+    for index, (test_data, actual_label) in enumerate(zip(x_test_df['full_code'], y_test_df['category'])):
+        #test_data = row['full_code']
 
         prompt = f"""
         Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or non-flaky.
@@ -757,37 +761,31 @@ def give_test_data_in_chunks_codegemma(x_test_nparray, tokenizer, model, batch_s
         #}
         categories, MAX_LENGTH = categories_defination_and_tokenizers_max_length()
         print(categories)
-        output_category_lower = output_category.lower()
+        #output_category_lower = output_category.lower()
+
+        category = parse_category_and_token_list(output_category)
+        tokens=""
+        print("Extracted Category:", category)
+        print("Extracted Tokens:", tokens)
+
+        #output_category_lower = output_category.lower()
+        category_value = categories.get(category.lower().strip(), 6)  # Return -1 if category not found
+        print(category_value)
     
-        # Check if the output matches any category
-        for category, value in categories.items():
-            if output_category_lower == category:
-                print(value)
-                #print(type(value))
-                total_preds.append(value)
-        #exit()
+        total_preds.append(category_value)
+        top_tokens_per_test.append(tokens)
 
-    #for g, x_test_chunk in x_test.groupby(np.arange(len(x_test)) // n):
-    #    count +=1
-    #    # Ensure x_test_chunk is a DataFrame
-    #    if isinstance(x_test_chunk, pd.Series):
-    #        x_test_chunk = x_test_chunk.to_frame().T
-    #    test_data = x_test_chunk.iloc[:, 0].tolist() if len(x_test_chunk) > 1 else [x_test_chunk.iloc[0, 0]]
-    #    #test_y = Y_test['which_tests'].iloc[g]
+        # Store tokens in dictionary
+        #if category_value != -1:  # Valid category
 
+        if category_value == actual_label:
+            if category_value not in category_token_map:
+                category_token_map[category_value] = []  # Initialize empty list if not exists
+            category_token_map[category_value].extend(tokens)  # Append tokens for the category
+            print("\nFinal Category-Token Map:", category_token_map)
 
+    return total_preds, category_token_map, top_tokens_per_test
 
-    #    #tokens_test = tokenizer.batch_encode_plus(test_data, max_length=max_length, pad_to_max_length=True, truncation=True)
-    #    #test_seq = torch.tensor(tokens_test['input_ids']).to(device)
-    #    #test_mask = torch.tensor(tokens_test['attention_mask']).to(device)
-
-    #    preds_chunk = model(test_seq, test_mask)
-    #    preds_chunk = preds_chunk.detach().cpu().numpy()
-    #    pred_class = np.argmax(preds_chunk, axis=1)
-    #    pred_logit = preds_chunk[0, pred_class]
-    #    total_preds.append(pred_class)
-
-    return total_preds
 
 #def give_test_data_in_chunks_codegemma(x_test_nparray, tokenizer, model, batch_size, device, fold, y_test_nparray, ml_technique): #BERT
 #    #max_length = 1024; 128
