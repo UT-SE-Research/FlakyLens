@@ -232,44 +232,53 @@ Your output must be in the following format, with no extra text:
 
     #return total_preds, category_token_map
 
+
+#def give_test_data_in_chunks(x_test_nparray, tokenizer, model, batch_size, device, fold, y_test_nparray): 
 def give_test_data_in_chunks_deep_seek_coder(x_test_nparray, tokenizer, model, batch_size, device, fold, y_test_nparray, ml_technique): 
+    # BERT-like max_length
+    max_length = 1024
     x_test_df = pd.DataFrame(x_test_nparray)
     y_test_df = pd.DataFrame(y_test_nparray, columns=['category'])  # Convert to DataFrame
-    #print(y_test_df)
+    print(y_test_df)
     n = 1  # len(x_test) / batch_size
     preds_chunks = None
     paired_data = []
     total_preds = []
-    top_tokens_per_test = []
     category_token_map = {}  # Dictionary to store tokens per categoy
     count = 0
-    categories, MAX_LENGTH = categories_defination_and_tokenizers_max_length()
 
-    MAX_LENGTH = 1600  # Or 8192, based on your model
-    examples=make_few_show_example(fold) 
+    categories, MAX_LENGTH = categories_defination_and_tokenizers_max_length()
     model.eval()  # Set the model to evaluation mode
     #for index, row in x_test_df.iterrows():
     for index, (test_data, actual_label) in enumerate(zip(x_test_df['full_code'], y_test_df['category'])):
-        print("****fold=", fold)
-        definitions = prompt_definition()
+        #print(prompt)
+        #exit()
+        definitions = f"""You are an expert at identifying flaky tests and analyzing their type. Flaky tests are tests that pass and fail non-deterministically for the same code. You are given a test, and you have to check whether it is flaky or not. If it is flaky, you have to identify the type of flakiness and classify into one of the following categories or just say Not Flaky: 
+        1. Async wait: The test execution makes an asynchronous call and does not properly wait for the result of the call to be available before proceeding. This can lead to non-deterministic test outcomes. 
+        2. Concurrency: Test non-determinism is due to different threads interacting in a non-desirable manner (but not due to asynchronous calls from the Async Wait category), e.g., due to data races, atomicity violations, or deadlocks. 
+        3. Time: Relying on the system time introduces non-deterministic failures, e.g., a test may fail when the midnight changes in the UTC time zone. Some tests also fail due to the precision by which time is reported as it can vary from one platform to another. 
+        4. Unordered collection: In general, when iterating over unordered collections (e.g., sets), the code should not assume that the elements are returned in a particular order. If it does assume, the test outcome can become non-deterministic as different executions may have a different order.
+        5. Test Order dependent test: The test depends on the order of execution of other tests. If the order changes, the test outcome may change. 
+        6. Not Flaky: The test is not flaky due to the above reasons."""
+        #test_data = row['full_code']
 
         prompt = f"""
-Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or not flaky.
-
-Here are some leveled examples:
-{examples}
-
-Now classify the following test:
-Test:
-{test_data}                        
-
-**Output Format (MUST follow this format exactly):**
-```
-**Category**: <one of the six categories above>
-``` 
-"""
+        Classify the given test as one of the following categories: **Async wait, Concurrency, Time, Unordered collection, Order dependent test, or Not Flaky**.
+        
+        **Test:**
+        {test_data}                        
+        
+        **Output Format (MUST follow this format exactly):**
+        ```
+        Category: <one of the six categories above>
+        ```
+        
+        **Important Rules:**
+        - **Category**: Choose exactly one from the given list.
+        """
 
         messages = [
+            #{"role": "system", "content": definitions},
             {"role": "user", "content": prompt}
         ]
         inputs = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).to(model.device)
@@ -293,52 +302,163 @@ Test:
         #output_category = tokenizer.decode(outputs[0][len(inputs[0]):], skip_special_tokens=True)
 
         # Decode and clean the output
-        raw_output = tokenizer.decode(outputs[0][len(input_ids[0]):], skip_special_tokens=True).strip()
-        #print("Raw model output:", raw_output)
-
-        # Extract only the category using regex
-        match = re.search(r'\*\*Category\*\*:\s*(.*)', raw_output)
-        category = match.group(1).strip() if match else "Unknown"
-
-        print(f"Predicted Category: {category}") 
-
-        #print("CATEG=",category)
-        # Check if "sequences" exists in outputs
-        '''if isinstance(outputs, torch.Tensor):
-            print("outputs is a torch.tensor")
-            sequences = outputs  # If `outputs` is a tensor, use it directly
-            # Extract generated tokens from outputs (excluding input tokens)
-            generated_tokens = outputs[:, input_ids.shape[1]:]  # Slice out the new tokens
-            
-            # Decode the generated tokens
-            output_text = tokenizer.decode(generated_tokens[0].tolist(), skip_special_tokens=True).strip()
-            
-            print("Decoded Output:", output_text)
-
+        output_text = tokenizer.decode(outputs[0][len(input_ids[0]):], skip_special_tokens=True).strip()
         print("Raw model output:", output_text)
+        #print('output_category =', output_category)
 
-        category = parse_category_and_token_list(output_text)'''
-        #print("category=", category)
+        # Define the mapping for categories
+        #categories = {
+        #    "async wait": 0,
+        #    "concurrency": 1,
+        #    "time": 2,
+        #    "unordered collection": 3,
+        #    "order dependent": 4,
+        #    "non-flaky": 5
+        #}
+        #output_category = output_category.strip().replace('"', '').split()[0]  # Keep only the category name
+        output_category = next((cat for cat in categories if cat in output_text.lower()), None)
 
-        output_category_lower = category.lower()
-        #Calculating IG
-        top_token_list = "" #collect_token_list_by_applying_ig(model_inputs, prompt, tokenizer, model, test_data, ml_technique)
+        #category, tokens = parse_category_and_token_list(output_text)
+        category = parse_category_and_token_list(output_text)
+        tokens = ""
+        category_value = categories.get(category.lower().strip(), 6)  # Return -1 if category not found
 
-        category_value = categories.get(output_category_lower, 6)  # Return -1 if category not found
-        print('category_value=')
         print(category_value)
+    
         total_preds.append(category_value)
-        top_tokens_per_test.append(top_token_list)
 
-        if category_value not in category_token_map:
-            category_token_map[category_value] = []  # Initialize empty list if not exists
+        # Store tokens in dictionary
+        print("category=",category_value,"actual_label=", actual_label)
+        #if category_value != -1:  # Valid category
+        if category_value == actual_label:
+            if category_value not in category_token_map:
+                category_token_map[category_value] = []  # Initialize empty list if not exists
+            category_token_map[category_value].extend(tokens)  # Append tokens for the category
+            print("\nFinal Category-Token Map:", category_token_map)
 
-        if top_token_list:
-            category_token_map[category_value].extend(top_token_list)  # Append tokens for the category
-        else:
-            category_token_map[category_value] = []  # Store empty list for large test cases
+    return total_preds, category_token_map
+        #output_category_lower = output_category.lower().strip()
+    #    print('output_category =', output_category)
+    #    flag = False
+    #    # Check if the output matches any category
+    #    for category, value in categories.items():
+    #        if output_category == category:
+    #            total_preds.append(value)
 
-    return total_preds, category_token_map, top_tokens_per_test
+    #            flag = True
+
+    #    if not flag:
+    #        total_preds.append(6)
+
+    #return total_preds
+
+#def give_test_data_in_chunks_deep_seek_coder(x_test_nparray, tokenizer, model, batch_size, device, fold, y_test_nparray, ml_technique): 
+#    x_test_df = pd.DataFrame(x_test_nparray)
+#    y_test_df = pd.DataFrame(y_test_nparray, columns=['category'])  # Convert to DataFrame
+#    #print(y_test_df)
+#    n = 1  # len(x_test) / batch_size
+#    preds_chunks = None
+#    paired_data = []
+#    total_preds = []
+#    top_tokens_per_test = []
+#    category_token_map = {}  # Dictionary to store tokens per categoy
+#    count = 0
+#    categories, MAX_LENGTH = categories_defination_and_tokenizers_max_length()
+#
+#    MAX_LENGTH = 1600  # Or 8192, based on your model
+#    examples=make_few_show_example(fold) 
+#    model.eval()  # Set the model to evaluation mode
+#    #for index, row in x_test_df.iterrows():
+#    for index, (test_data, actual_label) in enumerate(zip(x_test_df['full_code'], y_test_df['category'])):
+#        print("****fold=", fold)
+#        definitions = prompt_definition()
+#
+#        prompt = f"""
+#Classify the given test as one of the following categories: Async wait or Concurrency or Time or Unordered collection or Order dependent test or not flaky.
+#
+#Here are some leveled examples:
+#{examples}
+#
+#Now classify the following test:
+#Test:
+#{test_data}                        
+#
+#**Output Format (MUST follow this format exactly):**
+#```
+#**Category**: <one of the six categories above>
+#``` 
+#"""
+#
+#        messages = [
+#            {"role": "user", "content": prompt}
+#        ]
+#        inputs = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).to(model.device)
+#
+#        input_ids = inputs["input_ids"]
+#        attention_mask = inputs["attention_mask"]
+#        # tokenizer.eos_token_id is the id of <｜end▁of▁sentence｜>  token
+#        outputs = model.generate(
+#            #inputs, 
+#            input_ids=input_ids,
+#            attention_mask=attention_mask,
+#            max_new_tokens=512, 
+#            do_sample=False, 
+#            top_k=50, 
+#            top_p=0.95, 
+#            temperature=0.8,
+#            num_return_sequences=1, 
+#            pad_token_id=tokenizer.pad_token_id,  # Set pad_token_id explicitly
+#            eos_token_id=tokenizer.eos_token_id
+#        )
+#        #output_category = tokenizer.decode(outputs[0][len(inputs[0]):], skip_special_tokens=True)
+#
+#        # Decode and clean the output
+#        raw_output = tokenizer.decode(outputs[0][len(input_ids[0]):], skip_special_tokens=True).strip()
+#        #print("Raw model output:", raw_output)
+#
+#        # Extract only the category using regex
+#        match = re.search(r'\*\*Category\*\*:\s*(.*)', raw_output)
+#        category = match.group(1).strip() if match else "Unknown"
+#
+#        print(f"Predicted Category: {category}") 
+#
+#        #print("CATEG=",category)
+#        # Check if "sequences" exists in outputs
+#        '''if isinstance(outputs, torch.Tensor):
+#            print("outputs is a torch.tensor")
+#            sequences = outputs  # If `outputs` is a tensor, use it directly
+#            # Extract generated tokens from outputs (excluding input tokens)
+#            generated_tokens = outputs[:, input_ids.shape[1]:]  # Slice out the new tokens
+#            
+#            # Decode the generated tokens
+#            output_text = tokenizer.decode(generated_tokens[0].tolist(), skip_special_tokens=True).strip()
+#            
+#            print("Decoded Output:", output_text)
+#
+#        print("Raw model output:", output_text)
+#
+#        category = parse_category_and_token_list(output_text)'''
+#        #print("category=", category)
+#
+#        output_category_lower = category.lower()
+#        #Calculating IG
+#        top_token_list = "" #collect_token_list_by_applying_ig(model_inputs, prompt, tokenizer, model, test_data, ml_technique)
+#
+#        category_value = categories.get(output_category_lower, 6)  # Return -1 if category not found
+#        print('category_value=')
+#        print(category_value)
+#        total_preds.append(category_value)
+#        top_tokens_per_test.append(top_token_list)
+#
+#        if category_value not in category_token_map:
+#            category_token_map[category_value] = []  # Initialize empty list if not exists
+#
+#        if top_token_list:
+#            category_token_map[category_value].extend(top_token_list)  # Append tokens for the category
+#        else:
+#            category_token_map[category_value] = []  # Store empty list for large test cases
+#
+#    return total_preds, category_token_map, top_tokens_per_test
 
 
 #def give_test_data_in_chunks(x_test_nparray, tokenizer, model, batch_size, device, fold, y_test_nparray): #BERT
