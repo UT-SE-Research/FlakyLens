@@ -360,7 +360,7 @@ def give_test_data_in_chunks_deep_seek_coder(x_test_nparray, tokenizer, model, b
     total_preds = []
     category_token_map = {}  # Dictionary to store tokens per categoy
     count = 0
-
+    top_tokens_per_test = []
     categories, MAX_LENGTH = categories_defination_and_tokenizers_max_length()
     model.eval()  # Set the model to evaluation mode
     #for index, row in x_test_df.iterrows():
@@ -450,7 +450,7 @@ def give_test_data_in_chunks_deep_seek_coder(x_test_nparray, tokenizer, model, b
             category_token_map[category_value].extend(tokens)  # Append tokens for the category
             print("\nFinal Category-Token Map:", category_token_map)
 
-    return total_preds, category_token_map
+    return total_preds, category_token_map, top_tokens_per_test
         #output_category_lower = output_category.lower().strip()
     #    print('output_category =', output_category)
     #    flag = False
