@@ -25,9 +25,11 @@ elif [[ $2 == "BERT" ]]; then
     else
         python3 -W ignore Testing_per_project.py $dataset_file $model_weights "calculate_attribution_False" "FlakyLens_Categorization_PerProject-Data" "$2-$1" "$3" #$1=FlakyLens, $2=BERT
     fi
+#elif [[ $2 == "llama3_8b" ]]; then
+#    python3 Testing_llama3_8b_categorization.py $dataset_file $model_weights "${results_file}_llama3_8b.csv" "FlakyLens_Categorization_PerProject-Data" "$2-$1"
 
 elif [[ $2 == "qwen" || $2 == "gemma7b" || $2 == "gemma2b" || $2 == "codegemma" || $2 == "llama3_8b" || $2 == "deep_seek_coder" || $2 == "codellama" ]]; then
-    python3 Testing_other_LLMs.py $dataset_file $model_weights "${results_file}_qwen.csv" "FlakyLens_Categorization_PerProject-Data" "$2-$1"
+    python3 Testing_other_LLMs.py $dataset_file $model_weights "${results_file}_$2.csv" "FlakyLens_Categorization_PerProject-Data" "$2-$1"
 fi
 
 

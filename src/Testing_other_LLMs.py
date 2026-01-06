@@ -1136,23 +1136,24 @@ def give_test_data_in_chunks_gemma7b(x_test_nparray, tokenizer, model, batch_siz
         prompt = f"""
         Classify the given test as one of the following categories: **Async wait, Concurrency, Time, Unordered collection, Order dependent test, or Not Flaky**.
         
-        **Test:**
+        Test:
         {test_data}                        
         
-        **Output Format (MUST follow this format exactly):**
+        Output Format (MUST follow this format exactly):
         ```
         Category: <one of the six categories above>
         ```
         
-        **Important Rules:**
-        - **Category**: Choose exactly one from the given list.
+        Important Rules:
+        - Category: Choose exactly one from the given list.
         - Do not output anything else.
         """
         input_ids = tokenizer(prompt, return_tensors="pt").to(model.device)
         outputs = model.generate(**input_ids, max_new_tokens=100)
         #print("outputs=", outputs)
         #exit()
-        output_category = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        prompt_len = input_ids["input_ids"].shape[1]
+        output_category = tokenizer.decode(outputs[0][prompt_len:], skip_special_tokens=True)
 
         #output_lines = output.split('\n')
         #category_name = ""
@@ -1163,7 +1164,8 @@ def give_test_data_in_chunks_gemma7b(x_test_nparray, tokenizer, model, batch_siz
         #        break
         print("category_output=", output_category)
 
-        category = parse_category_and_token_list(output_category)
+        #category = parse_category_and_token_list(output_category)
+        category = parse_generated_output_to_get_category(output_category)
         tokens=""
         category_value = categories.get(category.lower().strip(), 6)  # Return -1 if category not found
 
@@ -1172,9 +1174,8 @@ def give_test_data_in_chunks_gemma7b(x_test_nparray, tokenizer, model, batch_siz
         top_tokens_per_test.append(tokens)
 
         #exit()
-        flag = False
+        '''flag = False
         #category, tokens = parse_gemma7b(output_category)
-        category = parse_generated_output_to_get_category(output_category)
         tokens = ""
         print("Extracted Category:", category)
         print("Extracted Tokens:", tokens)
@@ -1183,7 +1184,7 @@ def give_test_data_in_chunks_gemma7b(x_test_nparray, tokenizer, model, batch_siz
         category_value = categories.get(category.lower().strip(), 6)  # Return -1 if category not found
         print("category_value=\n", category_value)
     
-        total_preds.append(category_value)
+        total_preds.append(category_value)'''
 
         # Store tokens in dictionary
         #if category_value != -1:  # Valid category
