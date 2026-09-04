@@ -2,7 +2,7 @@
 
 
 # Purpose
-This README accompanies the artifact for the paper "Understanding and Improving Flaky Test Classification." This work introduces a new dataset that combines flaky and non-flaky tests, resulting in a more realistic distribution of test categories. The paper also presents a classification approach using fine-tuned models to predict the category of each test.
+This README accompanies the artifact for the paper [Understanding and Improving Flaky Test Classification](https://utexas.app.box.com/v/august-shi-OOPSLA2025). This work introduces a new dataset that combines flaky and non-flaky tests, resulting in a more realistic distribution of test categories. The paper also presents a classification approach using fine-tuned models to predict the category of each test.
 
 The primary goal of this artifact is to provide access to the dataset, training and inference code, and scripts for interpreting model predictions by identifying key features with attribution scores.
 
