@@ -1,0 +1,33 @@
+case,perturbation,before,after,flipped,P(Async) before,P(Async) after,P(Conc) before,P(Conc) after
+0,P1 rename framework ids,Async Wait,Async Wait,False,0.9457268,0.949727,0.0116199935,0.011777329
+2,P1 rename framework ids,Async Wait,Async Wait,False,0.941872,0.9463332,0.014934945,0.014905583
+16,P1 rename framework ids,Async Wait,Async Wait,False,0.90353864,0.9560583,0.014046925,0.0130662555
+7,P1 rename framework ids,Async Wait,Async Wait,False,0.8346633,0.7920343,0.12363004,0.15982978
+12,P1 rename framework ids,Async Wait,Async Wait,False,0.85073113,0.7283452,0.114262246,0.23066583
+4,P1 rename framework ids,Time,Concurrency,True,0.02516853,0.0549014,0.014281181,0.89469594
+6,P1 rename framework ids,Time,Time,False,0.070351705,0.03914932,0.009921275,0.008040216
+8,P1 rename framework ids,Concurrency,Concurrency,False,0.33264068,0.32448718,0.6196161,0.6279756
+0,P2 repo conc dead-code,Async Wait,Async Wait,False,0.9457268,0.9561071,0.0116199935,0.015539271
+2,P2 repo conc dead-code,Async Wait,Concurrency,True,0.941872,0.4216349,0.014934945,0.5301553
+16,P2 repo conc dead-code,Async Wait,Async Wait,False,0.90353864,0.92787457,0.014046925,0.03711392
+7,P2 repo conc dead-code,Async Wait,Async Wait,False,0.8346633,0.83466387,0.12363004,0.12362951
+12,P2 repo conc dead-code,Async Wait,Async Wait,False,0.85073113,0.85073096,0.114262246,0.11426246
+4,P2 repo conc dead-code,Time,Time,False,0.02516853,0.02516841,0.014281181,0.014281112
+6,P2 repo conc dead-code,Time,Async Wait,True,0.070351705,0.85113525,0.009921275,0.028976517
+8,P2 repo conc dead-code,Concurrency,Concurrency,False,0.33264068,0.3326404,0.6196161,0.6196164
+0,P3 inject LIVE conc,Async Wait,Async Wait,False,0.9457268,0.9580827,0.0116199935,0.012447776
+2,P3 inject LIVE conc,Async Wait,Async Wait,False,0.941872,0.53034586,0.014934945,0.42510292
+16,P3 inject LIVE conc,Async Wait,Async Wait,False,0.90353864,0.9511356,0.014046925,0.014312369
+7,P3 inject LIVE conc,Async Wait,Async Wait,False,0.8346633,0.5909139,0.12363004,0.35831937
+12,P3 inject LIVE conc,Async Wait,Async Wait,False,0.85073113,0.60968965,0.114262246,0.346833
+4,P3 inject LIVE conc,Time,Async Wait,True,0.02516853,0.843065,0.014281181,0.029554607
+6,P3 inject LIVE conc,Time,Async Wait,True,0.070351705,0.9424119,0.009921275,0.0129268
+8,P3 inject LIVE conc,Concurrency,Concurrency,False,0.33264068,0.02871144,0.6196161,0.94743764
+0,P4 strip conc tokens,Async Wait,Async Wait,False,0.9457268,0.94545573,0.0116199935,0.011518703
+2,P4 strip conc tokens,Async Wait,Async Wait,False,0.941872,0.45150658,0.014934945,0.014264111
+16,P4 strip conc tokens,Async Wait,Async Wait,False,0.90353864,0.88786906,0.014046925,0.014338853
+7,P4 strip conc tokens,Async Wait,Async Wait,False,0.8346633,0.7518265,0.12363004,0.20270245
+12,P4 strip conc tokens,Async Wait,Async Wait,False,0.85073113,0.85073096,0.114262246,0.11426246
+4,P4 strip conc tokens,Time,Time,False,0.02516853,0.02516841,0.014281181,0.014281112
+6,P4 strip conc tokens,Time,Time,False,0.070351705,0.07035161,0.009921275,0.00992127
+8,P4 strip conc tokens,Concurrency,Concurrency,False,0.33264068,0.37009698,0.6196161,0.5808424

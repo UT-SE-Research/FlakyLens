@@ -1,0 +1,24 @@
+# Python environment (6 GB — rebuild with: uv venv --python 3.9 .venv)
+.venv/
+__pycache__/
+*.pyc
+
+# Trained checkpoints (19 GB, each ~478 MB — exceeds GitHub's 100 MB file limit)
+models/*.pt
+models/*.bin
+models/*.safetensors
+
+# Local copy of microsoft/codebert-base (477 MB — fetched from the Hub)
+local_models/
+
+# HuggingFace export (weights published at Ariful1904129/codebert-flakytest-fold2)
+hf_export/model/model.safetensors
+hf_export/model/tokenizer.json
+hf_export/model/vocab.json
+hf_export/model/merges.txt
+
+# TensorBoard
+src/runs/
+
+# Perturbation byproducts written by count_perturb_type() during runs
+results/single*Perturbation_least_important_features.csv

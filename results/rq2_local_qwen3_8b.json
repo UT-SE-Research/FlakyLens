@@ -1,0 +1,16 @@
+{
+  "model": "Qwen/Qwen3-8B",
+  "fold": 2,
+  "n": 2181,
+  "macro_f1": 21.709957476489432,
+  "per_class_f1": {
+    "Async Wait": 9.411764705882355,
+    "Concurrency": 17.307692307692307,
+    "Time": 10.526315789473681,
+    "Unordered Collections": 0.0,
+    "Test Order Dependency": 0.0,
+    "Non-flaky": 93.01397205588823
+  },
+  "api_errors": 0,
+  "unparseable": 1
+}
