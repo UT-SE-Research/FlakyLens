@@ -1,0 +1,154 @@
+13 cue-free Concurrency tests (NARROW lexicon: no JDK concurrency primitive in the method)
+
+========================================================================================================
+[0] cdapio_cdap :: WorkflowHttpHandlerTest.testWorkflowForkFailure   (1383 chars)
+    @Test
+    public void testWorkflowForkFailure() throws Exception {
+        Assert.assertEquals(200, deploy(WorkflowFailureInForkApp.class).getStatusLine().getStatusCode());
+        Id.Application appId = Application.from(DEFAULT, NAME);
+        Id.Workflow workflowId = Workflow.from(appId, NAME);
+        Id.Program firstMRId = Program.from(appId, MAPREDUCE, FIRST_MAPREDUCE_NAME);
+        Id.Program secondMRId = Program.from(appId, MAPREDUCE, SECOND_MAPREDUCE_NAME);
+        String outputPath = new File(tmpFolder.newFolder(), "output").getAbsolutePath();
+        File fileToSync = new File(tmpFolder.newFolder() + "/sync.file");
+    SIGNALS: ['starts/stops a service, server, cluster or daemon']
+========================================================================================================
+[1] palantir_atlasdb :: extraSweepersGiveUpAfterFailingToAcquireEnoughTimes   (1157 chars)
+    @Test
+    public void extraSweepersGiveUpAfterFailingToAcquireEnoughTimes() throws InterruptedException {
+        int shards = 16;
+        int sweepers = 4;
+        int threads = shards / (sweepers / 2);
+        TimelockService stickyLockService = createStickyLockService();
+        createAndInitializeSweepersAndWaitForOneBackgroundIteration(sweepers, shards, threads, stickyLockService);
+        ArgumentCaptor<LockRequest> captor = ArgumentCaptor.forClass(LockRequest.class);
+        verify(stickyLockService, atLeast(shards * (shards / threads + 1) / 2 + shards * (threads * sweepers - shards)));
+    SIGNALS: none detected
+========================================================================================================
+[2] opensearch-project_OpenSearch :: testReplicaThreadedThroughputDegradationAndRejection   (1536 chars)
+    @Test
+    public void testReplicaThreadedThroughputDegradationAndRejection() throws Exception {
+        Settings settings = Settings.builder().put(IndexingPressure.MAX_INDEXING_BYTES.getKey(), "10KB")
+        .put(ShardIndexingPressureSettings.SHARD_INDEXING_PRESSURE_ENABLED.getKey(), true)
+        .put(ShardIndexingPressureSettings.SHARD_INDEXING_PRESSURE_ENFORCED.getKey(), true)
+        .put(ShardIndexingPressureMemoryManager.THROUGHPUT_DEGRADATION_LIMITS.getKey(), 1)
+        .put(ShardIndexingPressureSettings.REQUEST_SIZE_WINDOW.getKey(), 100)
+        .build();
+        final int NUM_THREADS = scaledRandomIntBetween(100, 120);
+    SIGNALS: ['multi-client / multi-node / replica interaction']
+========================================================================================================
+[3] graylog2_graylog2-server :: KafkaJournalTest.serverStatusUnthrottledIfJournalUtilizationIsLowerThanThreshold   (555 chars)
+    @Test
+    public void serverStatusUnthrottledIfJournalUtilizationIsLowerThanThreshold() throws Exception {
+        serverStatus.throttle();
+        final Size segmentSize = Size.kilobytes(1L);
+        final KafkaJournal journal = new KafkaJournal(journalDirectory, scheduler, segmentSize, Duration.standardSeconds(1L), Size.kilobytes(4L), Duration.standardSeconds(1L), 1000000, Duration.standardSeconds(1L), 90, new MetricRegistry(), serverStatus);
+        journal.flushDirtyLogs();
+        journal.cleanupLogs();
+        assertThat(serverStatus.getLifecycle()).isEqualTo(RUNNING);
+    }
+    SIGNALS: none detected
+========================================================================================================
+[4] apache_ignite :: GridCacheRebalancingWithAsyncClearingTest.testCorrectRebalancingCurrentlyRentingPartitions   (1084 chars)
+    @Test
+    public void testCorrectRebalancingCurrentlyRentingPartitions() throws Exception {
+        IgniteEx ignite = ((IgniteEx) (startGrids(3)));
+        ignite.cluster().active(true);
+        final int keysCnt = SF.applyLB(300000, 10000);
+        try (final IgniteDataStreamer<Integer, Integer> ds = ignite.dataStreamer(CACHE_NAME)) {
+            log.info("Writing initial data...");
+            ds.allowOverwrite(true);
+            for (int k = 1; k <= keysCnt; k++) {
+    SIGNALS: ['starts/stops a service, server, cluster or daemon']
+========================================================================================================
+[5] salesforce_reactive-grpc :: ChainedCallIntegrationTest.servicesCanCallOtherServices   (854 chars)
+    @Test
+    public void servicesCanCallOtherServices() throws InterruptedException {
+        ReactorGreeterGrpc.ReactorGreeterStub stub = ReactorGreeterGrpc.newReactorStub(channel);
+        Mono<String> chain =
+        Mono.just(request("X")).compose(stub::sayHello).map(ChainedCallIntegrationTest::bridge).doOnSuccess(System.out::println).as(stub::sayHelloRespStream).map(ChainedCallIntegrationTest::bridge).doOnNext(System.out::println).compose(stub::sayHelloBothStream).map(ChainedCallIntegrationTest::bridge).doOnNext(System.out::println).as(stub::sayHelloReqStream).map(ChainedCallIntegrationTest::bridge).doOnSuccess(System.out::println).compose(stub::
+    SIGNALS: none detected
+========================================================================================================
+[6] apache_pulsar :: PrometheusMetricsTest.testPerTopicStats   (6611 chars)
+    @Test
+    public void testPerTopicStats() throws Exception {
+        String randSeed = randomName(16);
+        System.out.println("The randSeed of testPerTopicStats() is: " + randSeed);
+        Producer<byte[]> p1 = pulsarClient.newProducer().topic("persistent://my-property/use/" + randSeed + "/my-topic1").create();
+        Producer<byte[]> p2 = pulsarClient.newProducer().topic("persistent://my-property/use/" + randSeed + "/my-topic2").create();
+        for (int i = 0; i < 10; i++) {
+            String message = "my-message-" + i;
+            p1.send(message.getBytes());
+    SIGNALS: ['multi-client / multi-node / replica interaction']
+========================================================================================================
+[7] graylog2_graylog2-server :: KafkaJournalTest.serverStatusThrottledIfJournalUtilizationIsHigherThanThreshold   (602 chars)
+    @Test
+    public void serverStatusThrottledIfJournalUtilizationIsHigherThanThreshold() throws Exception {
+        serverStatus.running();
+        final Size segmentSize = Size.kilobytes(1L);
+        final KafkaJournal journal = new KafkaJournal(journalDirectory, scheduler, segmentSize, Duration.standardSeconds(1L), Size.kilobytes(4L), Duration.standardSeconds(1L), 1000000, Duration.standardSeconds(1L), 90, new MetricRegistry(), serverStatus);
+        createBulkChunks(journal, segmentSize, 4);
+        journal.flushDirtyLogs();
+        journal.cleanupLogs();
+        assertThat(serverStatus.getLifecycle()).isEqualTo(THROTTLED);
+    SIGNALS: none detected
+========================================================================================================
+[8] apache_cassandra :: testWithMismatchingPending   (1347 chars)
+    @Test
+    public void testWithMismatchingPending() throws Throwable
+    {
+        try(Cluster cluster = init(Cluster.build(2).withConfig(config -> config.with(GOSSIP).with(NETWORK)).start()))
+        {
+            cluster.schemaChange("create table " + KEYSPACE + ".tbl (id int primary key, t int)");
+            insert(cluster.coordinator(1), 0, 100);
+            cluster.forEach((node) -> node.flush(KEYSPACE));
+            cluster.get(1).callOnInstance(repair(options(false)));
+    SIGNALS: ['starts/stops a service, server, cluster or daemon']
+========================================================================================================
+[9] neo4j_neo4j :: schema.IndexPopulationIT.shutdownDatabaseDuringIndexPopulations   (810 chars)
+    @Test
+    public void shutdownDatabaseDuringIndexPopulations() {
+        AssertableLogProvider assertableLogProvider = new AssertableLogProvider(true);
+        File storeDir = directory.directory("shutdownDbTest");
+        Label testLabel = Label.label("testLabel");
+        String propertyName = "testProperty";
+        GraphDatabaseService shutDownDb = new TestGraphDatabaseFactory().setInternalLogProvider(assertableLogProvider).newEmbeddedDatabase(storeDir);
+        prePopulateDatabase(shutDownDb, testLabel, propertyName);
+        try (final Transaction transaction = shutDownDb.beginTx()) {
+    SIGNALS: ['starts/stops a service, server, cluster or daemon']
+========================================================================================================
+[10] apache_kafka :: testForceMetadataRefreshForPatternSubscriptionDuringRebalance   (1474 chars)
+    @Test
+    public void testForceMetadataRefreshForPatternSubscriptionDuringRebalance() {
+        final String consumerId = "consumer";
+        subscriptions.subscribe(Pattern.compile(".*"), rebalanceListener);
+        client.updateMetadata(TestUtils.metadataUpdateWith(1, singletonMap(topic1, 1)));
+        assertEquals(singleton(topic1), subscriptions.subscription());
+        client.prepareResponse(groupCoordinatorResponse(node, Errors.NONE));
+        coordinator.ensureCoordinatorReady(time.timer(Long.MAX_VALUE));
+        client.prepareMetadataUpdate(metadataResponse);
+    SIGNALS: ['polls / retries / waits for a condition', 'multi-client / multi-node / replica interaction']
+========================================================================================================
+[11] cdapio_cdap :: TestFrameworkTestRun.testAppWithServices   (4354 chars)
+    @Test
+    public void testAppWithServices() throws Exception {
+        ApplicationManager applicationManager = deployApplication(AppWithServices.class);
+        LOG.info("Deployed.");
+        ServiceManager serviceManager = applicationManager.getServiceManager(AppWithServices.SERVICE_NAME).start();
+        serviceManager.waitForStatus(true);
+        LOG.info("Service Started");
+        URL serviceURL = serviceManager.getServiceURL(15, TimeUnit.SECONDS);
+        Assert.assertNotNull(serviceURL);
+    SIGNALS: ['async-api call (Future/CompletableFuture-returning, *Async, submit/schedule)', 'starts/stops a service, server, cluster or daemon', 'polls / retries / waits for a condition']
+========================================================================================================
+[12] ReactiveX_RxJava :: OperatorRetryTest.testRetryWithBackpressure   (928 chars)
+    @Test
+    public void testRetryWithBackpressure() throws InterruptedException {
+        final int NUM_RETRIES = RxRingBuffer.SIZE * 2;
+        for (int i = 0; i < 400; i++) {
+            @SuppressWarnings("unchecked")
+            Observer<String> observer = mock(Observer.class);
+            Observable<String> origin = Observable.create(new FuncWithErrors(NUM_RETRIES));
+            TestSubscriber<String> ts = new TestSubscriber<String>(observer);
+            origin.retry().observeOn(Schedulers.computation()).unsafeSubscribe(ts);
+    SIGNALS: ['polls / retries / waits for a condition']

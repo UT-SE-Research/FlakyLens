@@ -1,0 +1,22 @@
+rows: 8574   distinct id: 8508
+duplicated id values: 66
+  ...where the duplicates span different PROJECTS : 58
+  ...where the duplicates span different CATEGORIES: 66
+  ...where (project,test_name) is identical        : 0
+
+example collisions:
+  id=281
+     project=soot-oss_soot                  cat=3  test=TestDominance.TestSimpleDiamond
+     project=apache_hadoop                  cat=5  test=TestOffsetRange.testConstructor1
+  id=282
+     project=apache_shardingsphere-elasticjob cat=4  test=b022898ef1b8c984e17efb2a422ee45f6b13e46e.assertIsShutdo
+     project=apache_hadoop                  cat=5  test=TestOffsetRange.testConstructor2
+  id=283
+     project=Ericsson_ecchronos             cat=3  test=TestRepairTask.testPartialRepair
+     project=apache_hadoop                  cat=5  test=TestOffsetRange.testConstructor3
+
+distinct (project,test_name): 8245 / 8574
+
+distinct (project,test_name,code): 8562 / 8574
+
+distinct full_code: 8435 / 8574

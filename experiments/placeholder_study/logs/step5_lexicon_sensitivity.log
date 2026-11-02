@@ -1,0 +1,18 @@
+lexicon                                                           Conc cue-free  Async cue-free
+NARROW  (JDK concurrency primitives only)                           13/37 (35%)     30/76 (39%)
+BROAD   (+ async/worker/scheduler/race/interrupt, case-insensitive)     7/37 (19%)     26/76 (34%)
+
+NARROW set = 13 cue-free Concurrency tests:
+  0  cdapio_cdap                       WorkflowHttpHandlerTest.testWorkflowForkFailure
+  1  palantir_atlasdb                  extraSweepersGiveUpAfterFailingToAcquireEnoughTimes
+  2  opensearch-project_OpenSearch     testReplicaThreadedThroughputDegradationAndRejection
+  3  graylog2_graylog2-server          KafkaJournalTest.serverStatusUnthrottledIfJournalUtili
+  4  apache_ignite                     GridCacheRebalancingWithAsyncClearingTest.testCorrectR
+  5  salesforce_reactive-grpc          ChainedCallIntegrationTest.servicesCanCallOtherService
+  6  apache_pulsar                     PrometheusMetricsTest.testPerTopicStats
+  7  graylog2_graylog2-server          KafkaJournalTest.serverStatusThrottledIfJournalUtiliza
+  8  apache_cassandra                  testWithMismatchingPending
+  9  neo4j_neo4j                       schema.IndexPopulationIT.shutdownDatabaseDuringIndexPo
+  10 apache_kafka                      testForceMetadataRefreshForPatternSubscriptionDuringRe
+  11 cdapio_cdap                       TestFrameworkTestRun.testAppWithServices
+  12 ReactiveX_RxJava                  OperatorRetryTest.testRetryWithBackpressure

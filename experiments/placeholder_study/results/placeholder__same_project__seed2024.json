@@ -1,0 +1,286 @@
+{
+  "cell": "placeholder__same_project__seed2024",
+  "corpus": "placeholder",
+  "setting": "same_project",
+  "seed": 2024,
+  "config": {
+    "corpus": "placeholder",
+    "setting": "same_project",
+    "seed": 2024,
+    "epochs": 20,
+    "patience": 8,
+    "batch_size": 8,
+    "max_length": 512,
+    "lr": 1e-05,
+    "gamma": 2.0,
+    "undersample_majority": 800,
+    "oversample_minority": 160,
+    "base_model": "local_models/codebert-base",
+    "root": "experiments/placeholder_study"
+  },
+  "epochs_run": 20,
+  "minutes": 14.44,
+  "best_valid_macro_f1": 66.26984126984127,
+  "history": [
+    {
+      "epoch": 1,
+      "valid_macro_f1": 0.24727092051738153
+    },
+    {
+      "epoch": 2,
+      "valid_macro_f1": 0.5060473435435503
+    },
+    {
+      "epoch": 3,
+      "valid_macro_f1": 0.5059808377412733
+    },
+    {
+      "epoch": 4,
+      "valid_macro_f1": 0.5946129628668179
+    },
+    {
+      "epoch": 5,
+      "valid_macro_f1": 0.6486136584313302
+    },
+    {
+      "epoch": 6,
+      "valid_macro_f1": 0.5771151996151995
+    },
+    {
+      "epoch": 7,
+      "valid_macro_f1": 0.6173929773929774
+    },
+    {
+      "epoch": 8,
+      "valid_macro_f1": 0.6336996336996337
+    },
+    {
+      "epoch": 9,
+      "valid_macro_f1": 0.6584249084249084
+    },
+    {
+      "epoch": 10,
+      "valid_macro_f1": 0.6312025012025012
+    },
+    {
+      "epoch": 11,
+      "valid_macro_f1": 0.6423616579235011
+    },
+    {
+      "epoch": 12,
+      "valid_macro_f1": 0.6515199615199615
+    },
+    {
+      "epoch": 13,
+      "valid_macro_f1": 0.6319523643661574
+    },
+    {
+      "epoch": 14,
+      "valid_macro_f1": 0.6515199615199615
+    },
+    {
+      "epoch": 15,
+      "valid_macro_f1": 0.6312025012025012
+    },
+    {
+      "epoch": 16,
+      "valid_macro_f1": 0.6423809523809524
+    },
+    {
+      "epoch": 17,
+      "valid_macro_f1": 0.6626984126984127
+    },
+    {
+      "epoch": 18,
+      "valid_macro_f1": 0.6626984126984127
+    },
+    {
+      "epoch": 19,
+      "valid_macro_f1": 0.6626984126984127
+    },
+    {
+      "epoch": 20,
+      "valid_macro_f1": 0.6431308155446086
+    }
+  ],
+  "test_best_epoch": {
+    "accuracy": 98.44108207244383,
+    "macro_f1": 66.09710550887021,
+    "per_class_f1": {
+      "Async Wait": 57.14285714285714,
+      "Concurrency": 28.57142857142857,
+      "Time": 57.14285714285715,
+      "Unordered Collections": 66.66666666666666,
+      "Test Order Dependency": 87.05882352941177,
+      "Non-flaky": 100.0
+    },
+    "per_class_precision": {
+      "Async Wait": 43.47826086956522,
+      "Concurrency": 75.0,
+      "Time": 100.0,
+      "Unordered Collections": 60.0,
+      "Test Order Dependency": 88.09523809523809,
+      "Non-flaky": 100.0
+    },
+    "per_class_recall": {
+      "Async Wait": 83.33333333333334,
+      "Concurrency": 17.647058823529413,
+      "Time": 40.0,
+      "Unordered Collections": 75.0,
+      "Test Order Dependency": 86.04651162790698,
+      "Non-flaky": 100.0
+    },
+    "support": {
+      "Async Wait": 24,
+      "Concurrency": 17,
+      "Time": 15,
+      "Unordered Collections": 4,
+      "Test Order Dependency": 43,
+      "Non-flaky": 2078
+    },
+    "confusion_matrix": [
+      [
+        20,
+        1,
+        0,
+        0,
+        3,
+        0
+      ],
+      [
+        13,
+        3,
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        6,
+        0,
+        6,
+        2,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        3,
+        0,
+        0
+      ],
+      [
+        6,
+        0,
+        0,
+        0,
+        37,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        2078
+      ]
+    ],
+    "conc_to_async_count": 13,
+    "conc_total": 17,
+    "conc_to_async_rate": 76.47058823529412,
+    "conc_correct": 3
+  },
+  "test_last_epoch": {
+    "accuracy": 98.34938101788171,
+    "macro_f1": 65.50537902301313,
+    "per_class_f1": {
+      "Async Wait": 56.33802816901409,
+      "Concurrency": 28.57142857142857,
+      "Time": 57.14285714285715,
+      "Unordered Collections": 66.66666666666666,
+      "Test Order Dependency": 84.33734939759036,
+      "Non-flaky": 99.975944190522
+    },
+    "per_class_precision": {
+      "Async Wait": 42.5531914893617,
+      "Concurrency": 75.0,
+      "Time": 100.0,
+      "Unordered Collections": 60.0,
+      "Test Order Dependency": 87.5,
+      "Non-flaky": 99.95189995189995
+    },
+    "per_class_recall": {
+      "Async Wait": 83.33333333333334,
+      "Concurrency": 17.647058823529413,
+      "Time": 40.0,
+      "Unordered Collections": 75.0,
+      "Test Order Dependency": 81.3953488372093,
+      "Non-flaky": 100.0
+    },
+    "support": {
+      "Async Wait": 24,
+      "Concurrency": 17,
+      "Time": 15,
+      "Unordered Collections": 4,
+      "Test Order Dependency": 43,
+      "Non-flaky": 2078
+    },
+    "confusion_matrix": [
+      [
+        20,
+        1,
+        0,
+        0,
+        3,
+        0
+      ],
+      [
+        13,
+        3,
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        6,
+        0,
+        6,
+        2,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        3,
+        0,
+        0
+      ],
+      [
+        7,
+        0,
+        0,
+        0,
+        35,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        2078
+      ]
+    ],
+    "conc_to_async_count": 13,
+    "conc_total": 17,
+    "conc_to_async_rate": 76.47058823529412,
+    "conc_correct": 3
+  }
+}

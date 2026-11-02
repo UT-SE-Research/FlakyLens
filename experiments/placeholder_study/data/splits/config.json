@@ -1,0 +1,18 @@
+{
+  "seed": 42,
+  "fold": 2,
+  "sizes": {
+    "train": 5114,
+    "valid": 1279,
+    "test": 2181
+  },
+  "test_class_quota": {
+    "Async Wait": 24,
+    "Concurrency": 17,
+    "Time": 15,
+    "Unordered Collections": 4,
+    "Test Order Dependency": 43,
+    "Non-flaky": 2078
+  },
+  "note": "same_project test matches project_disjoint test per-class counts exactly"
+}

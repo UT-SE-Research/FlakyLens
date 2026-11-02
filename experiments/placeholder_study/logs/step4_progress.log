@@ -1,0 +1,14 @@
+corpus      setting             seed  macroF1     acc    C->A    rate  ConcF1    min
+original    project_disjoint      42   66.46%  98.49%   15/17   88.2%   0.00%   10.7
+original    project_disjoint    1337   57.96%  97.98%   16/17   94.1%   0.00%   13.9
+original    project_disjoint    2024   62.52%  98.17%   16/17   94.1%   0.00%    7.9
+original    same_project          42   62.04%  98.21%   15/17   88.2%  19.05%    8.9
+original    same_project        1337   65.01%  98.17%   10/17   58.8%  45.16%    7.5
+original    same_project        2024   66.05%  98.26%   16/17   94.1%   9.09%    8.9
+placeholder project_disjoint      42   54.27%  97.85%   16/17   94.1%  11.11%   10.6
+placeholder project_disjoint    1337   56.95%  97.80%   11/17   64.7%  46.15%   11.9
+placeholder project_disjoint    2024   60.50%  98.07%    7/17   41.2%  51.85%    9.9
+placeholder same_project          42   59.22%  98.17%   10/17   58.8%  20.00%   14.7
+placeholder same_project        1337   64.11%  98.12%   13/17   76.5%  16.00%   11.3
+
+completed: 11/12   total GPU minutes: 116

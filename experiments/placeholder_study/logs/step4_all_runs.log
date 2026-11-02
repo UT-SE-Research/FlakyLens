@@ -1,0 +1,234 @@
+##### original / project_disjoint / seed 42
+[original__project_disjoint__seed42] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[original__project_disjoint__seed42] epoch  1/20 valid_macro_f1=0.1921  <- best
+[original__project_disjoint__seed42] epoch  2/20 valid_macro_f1=0.3325  <- best
+[original__project_disjoint__seed42] epoch  3/20 valid_macro_f1=0.6166  <- best
+[original__project_disjoint__seed42] epoch  4/20 valid_macro_f1=0.6216  <- best
+[original__project_disjoint__seed42] epoch  5/20 valid_macro_f1=0.7242  <- best
+[original__project_disjoint__seed42] epoch  6/20 valid_macro_f1=0.7262  <- best
+[original__project_disjoint__seed42] epoch  7/20 valid_macro_f1=0.7709  <- best
+[original__project_disjoint__seed42] epoch  8/20 valid_macro_f1=0.7216
+[original__project_disjoint__seed42] epoch  9/20 valid_macro_f1=0.7216
+[original__project_disjoint__seed42] epoch 10/20 valid_macro_f1=0.7088
+[original__project_disjoint__seed42] epoch 11/20 valid_macro_f1=0.7262
+[original__project_disjoint__seed42] epoch 12/20 valid_macro_f1=0.7262
+[original__project_disjoint__seed42] epoch 13/20 valid_macro_f1=0.7262
+[original__project_disjoint__seed42] epoch 14/20 valid_macro_f1=0.7262
+[original__project_disjoint__seed42] epoch 15/20 valid_macro_f1=0.7262
+[original__project_disjoint__seed42] early stop at epoch 15
+[original__project_disjoint__seed42] DONE macro-F1=66.46%  acc=98.49%  Conc->Async=15/17 (88.2%)  Conc-F1=0.00%
+##### original / project_disjoint / seed 1337
+[original__project_disjoint__seed1337] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[original__project_disjoint__seed1337] epoch  1/20 valid_macro_f1=0.4934  <- best
+[original__project_disjoint__seed1337] epoch  2/20 valid_macro_f1=0.4125
+[original__project_disjoint__seed1337] epoch  3/20 valid_macro_f1=0.6868  <- best
+[original__project_disjoint__seed1337] epoch  4/20 valid_macro_f1=0.7132  <- best
+[original__project_disjoint__seed1337] epoch  5/20 valid_macro_f1=0.6781
+[original__project_disjoint__seed1337] epoch  6/20 valid_macro_f1=0.7017
+[original__project_disjoint__seed1337] epoch  7/20 valid_macro_f1=0.6440
+[original__project_disjoint__seed1337] epoch  8/20 valid_macro_f1=0.7461  <- best
+[original__project_disjoint__seed1337] epoch  9/20 valid_macro_f1=0.7130
+[original__project_disjoint__seed1337] epoch 10/20 valid_macro_f1=0.7318
+[original__project_disjoint__seed1337] epoch 11/20 valid_macro_f1=0.7318
+[original__project_disjoint__seed1337] epoch 12/20 valid_macro_f1=0.7653  <- best
+[original__project_disjoint__seed1337] epoch 13/20 valid_macro_f1=0.7318
+[original__project_disjoint__seed1337] epoch 14/20 valid_macro_f1=0.7318
+[original__project_disjoint__seed1337] epoch 15/20 valid_macro_f1=0.7653
+[original__project_disjoint__seed1337] epoch 16/20 valid_macro_f1=0.7461
+[original__project_disjoint__seed1337] epoch 17/20 valid_macro_f1=0.7653
+[original__project_disjoint__seed1337] epoch 18/20 valid_macro_f1=0.7653
+[original__project_disjoint__seed1337] epoch 19/20 valid_macro_f1=0.7653
+[original__project_disjoint__seed1337] epoch 20/20 valid_macro_f1=0.7461
+[original__project_disjoint__seed1337] early stop at epoch 20
+[original__project_disjoint__seed1337] DONE macro-F1=57.96%  acc=97.98%  Conc->Async=16/17 (94.1%)  Conc-F1=0.00%
+##### original / project_disjoint / seed 2024
+[original__project_disjoint__seed2024] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[original__project_disjoint__seed2024] epoch  1/20 valid_macro_f1=0.3724  <- best
+[original__project_disjoint__seed2024] epoch  2/20 valid_macro_f1=0.7195  <- best
+[original__project_disjoint__seed2024] epoch  3/20 valid_macro_f1=0.8005  <- best
+[original__project_disjoint__seed2024] epoch  4/20 valid_macro_f1=0.7496
+[original__project_disjoint__seed2024] epoch  5/20 valid_macro_f1=0.7780
+[original__project_disjoint__seed2024] epoch  6/20 valid_macro_f1=0.7909
+[original__project_disjoint__seed2024] epoch  7/20 valid_macro_f1=0.7680
+[original__project_disjoint__seed2024] epoch  8/20 valid_macro_f1=0.7680
+[original__project_disjoint__seed2024] epoch  9/20 valid_macro_f1=0.7438
+[original__project_disjoint__seed2024] epoch 10/20 valid_macro_f1=0.7438
+[original__project_disjoint__seed2024] epoch 11/20 valid_macro_f1=0.7594
+[original__project_disjoint__seed2024] early stop at epoch 11
+[original__project_disjoint__seed2024] DONE macro-F1=62.52%  acc=98.17%  Conc->Async=16/17 (94.1%)  Conc-F1=0.00%
+##### original / same_project / seed 42
+[original__same_project__seed42] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[original__same_project__seed42] epoch  1/20 valid_macro_f1=0.2600  <- best
+[original__same_project__seed42] epoch  2/20 valid_macro_f1=0.3280  <- best
+##### SKIP (done) original / project_disjoint / seed 42
+##### SKIP (done) original / project_disjoint / seed 1337
+##### SKIP (done) original / project_disjoint / seed 2024
+##### original / same_project / seed 42
+[original__same_project__seed42] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[original__same_project__seed42] epoch  1/20 valid_macro_f1=0.2600  <- best
+[original__same_project__seed42] epoch  2/20 valid_macro_f1=0.3280  <- best
+[original__same_project__seed42] epoch  3/20 valid_macro_f1=0.4826  <- best
+[original__same_project__seed42] epoch  4/20 valid_macro_f1=0.6120  <- best
+[original__same_project__seed42] epoch  5/20 valid_macro_f1=0.6507  <- best
+[original__same_project__seed42] epoch  6/20 valid_macro_f1=0.6167
+[original__same_project__seed42] epoch  7/20 valid_macro_f1=0.6157
+[original__same_project__seed42] epoch  8/20 valid_macro_f1=0.6157
+[original__same_project__seed42] epoch  9/20 valid_macro_f1=0.6152
+[original__same_project__seed42] epoch 10/20 valid_macro_f1=0.6269
+[original__same_project__seed42] epoch 11/20 valid_macro_f1=0.6269
+[original__same_project__seed42] epoch 12/20 valid_macro_f1=0.6269
+[original__same_project__seed42] epoch 13/20 valid_macro_f1=0.6269
+[original__same_project__seed42] early stop at epoch 13
+[original__same_project__seed42] DONE macro-F1=62.04%  acc=98.21%  Conc->Async=15/17 (88.2%)  Conc-F1=19.05%
+##### original / same_project / seed 1337
+[original__same_project__seed1337] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[original__same_project__seed1337] epoch  1/20 valid_macro_f1=0.3546  <- best
+[original__same_project__seed1337] epoch  2/20 valid_macro_f1=0.5811  <- best
+[original__same_project__seed1337] epoch  3/20 valid_macro_f1=0.6618  <- best
+[original__same_project__seed1337] epoch  4/20 valid_macro_f1=0.6387
+[original__same_project__seed1337] epoch  5/20 valid_macro_f1=0.6450
+[original__same_project__seed1337] epoch  6/20 valid_macro_f1=0.6487
+[original__same_project__seed1337] epoch  7/20 valid_macro_f1=0.6487
+[original__same_project__seed1337] epoch  8/20 valid_macro_f1=0.6450
+[original__same_project__seed1337] epoch  9/20 valid_macro_f1=0.6454
+[original__same_project__seed1337] epoch 10/20 valid_macro_f1=0.6454
+[original__same_project__seed1337] epoch 11/20 valid_macro_f1=0.6454
+[original__same_project__seed1337] early stop at epoch 11
+[original__same_project__seed1337] DONE macro-F1=65.01%  acc=98.17%  Conc->Async=10/17 (58.8%)  Conc-F1=45.16%
+##### original / same_project / seed 2024
+[original__same_project__seed2024] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[original__same_project__seed2024] epoch  1/20 valid_macro_f1=0.3868  <- best
+[original__same_project__seed2024] epoch  2/20 valid_macro_f1=0.5502  <- best
+[original__same_project__seed2024] epoch  3/20 valid_macro_f1=0.5957  <- best
+[original__same_project__seed2024] epoch  4/20 valid_macro_f1=0.6670  <- best
+[original__same_project__seed2024] epoch  5/20 valid_macro_f1=0.6930  <- best
+[original__same_project__seed2024] epoch  6/20 valid_macro_f1=0.6930
+[original__same_project__seed2024] epoch  7/20 valid_macro_f1=0.6930
+[original__same_project__seed2024] epoch  8/20 valid_macro_f1=0.6930
+[original__same_project__seed2024] epoch  9/20 valid_macro_f1=0.6930
+[original__same_project__seed2024] epoch 10/20 valid_macro_f1=0.6930
+[original__same_project__seed2024] epoch 11/20 valid_macro_f1=0.6930
+[original__same_project__seed2024] epoch 12/20 valid_macro_f1=0.6930
+[original__same_project__seed2024] epoch 13/20 valid_macro_f1=0.6930
+[original__same_project__seed2024] early stop at epoch 13
+[original__same_project__seed2024] DONE macro-F1=66.05%  acc=98.26%  Conc->Async=16/17 (94.1%)  Conc-F1=9.09%
+##### placeholder / project_disjoint / seed 42
+[placeholder__project_disjoint__seed42] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[placeholder__project_disjoint__seed42] epoch  1/20 valid_macro_f1=0.3190  <- best
+[placeholder__project_disjoint__seed42] epoch  2/20 valid_macro_f1=0.3580  <- best
+[placeholder__project_disjoint__seed42] epoch  3/20 valid_macro_f1=0.4671  <- best
+[placeholder__project_disjoint__seed42] epoch  4/20 valid_macro_f1=0.4948  <- best
+[placeholder__project_disjoint__seed42] epoch  5/20 valid_macro_f1=0.6169  <- best
+[placeholder__project_disjoint__seed42] epoch  6/20 valid_macro_f1=0.6905  <- best
+[placeholder__project_disjoint__seed42] epoch  7/20 valid_macro_f1=0.5672
+[placeholder__project_disjoint__seed42] epoch  8/20 valid_macro_f1=0.5979
+[placeholder__project_disjoint__seed42] epoch  9/20 valid_macro_f1=0.6810
+[placeholder__project_disjoint__seed42] epoch 10/20 valid_macro_f1=0.6635
+[placeholder__project_disjoint__seed42] epoch 11/20 valid_macro_f1=0.6441
+[placeholder__project_disjoint__seed42] epoch 12/20 valid_macro_f1=0.6441
+[placeholder__project_disjoint__seed42] epoch 13/20 valid_macro_f1=0.6441
+[placeholder__project_disjoint__seed42] epoch 14/20 valid_macro_f1=0.6441
+[placeholder__project_disjoint__seed42] early stop at epoch 14
+[placeholder__project_disjoint__seed42] DONE macro-F1=54.27%  acc=97.85%  Conc->Async=16/17 (94.1%)  Conc-F1=11.11%
+##### placeholder / project_disjoint / seed 1337
+[placeholder__project_disjoint__seed1337] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[placeholder__project_disjoint__seed1337] epoch  1/20 valid_macro_f1=0.2650  <- best
+[placeholder__project_disjoint__seed1337] epoch  2/20 valid_macro_f1=0.3347  <- best
+[placeholder__project_disjoint__seed1337] epoch  3/20 valid_macro_f1=0.6109  <- best
+[placeholder__project_disjoint__seed1337] epoch  4/20 valid_macro_f1=0.5563
+[placeholder__project_disjoint__seed1337] epoch  5/20 valid_macro_f1=0.6559  <- best
+[placeholder__project_disjoint__seed1337] epoch  6/20 valid_macro_f1=0.6168
+[placeholder__project_disjoint__seed1337] epoch  7/20 valid_macro_f1=0.6492
+[placeholder__project_disjoint__seed1337] epoch  8/20 valid_macro_f1=0.6847  <- best
+[placeholder__project_disjoint__seed1337] epoch  9/20 valid_macro_f1=0.6446
+[placeholder__project_disjoint__seed1337] epoch 10/20 valid_macro_f1=0.6715
+[placeholder__project_disjoint__seed1337] epoch 11/20 valid_macro_f1=0.6287
+[placeholder__project_disjoint__seed1337] epoch 12/20 valid_macro_f1=0.6412
+[placeholder__project_disjoint__seed1337] epoch 13/20 valid_macro_f1=0.6204
+[placeholder__project_disjoint__seed1337] epoch 14/20 valid_macro_f1=0.6260
+[placeholder__project_disjoint__seed1337] epoch 15/20 valid_macro_f1=0.6260
+[placeholder__project_disjoint__seed1337] epoch 16/20 valid_macro_f1=0.6204
+[placeholder__project_disjoint__seed1337] early stop at epoch 16
+[placeholder__project_disjoint__seed1337] DONE macro-F1=56.95%  acc=97.80%  Conc->Async=11/17 (64.7%)  Conc-F1=46.15%
+##### placeholder / project_disjoint / seed 2024
+[placeholder__project_disjoint__seed2024] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[placeholder__project_disjoint__seed2024] epoch  1/20 valid_macro_f1=0.2872  <- best
+[placeholder__project_disjoint__seed2024] epoch  2/20 valid_macro_f1=0.4475  <- best
+[placeholder__project_disjoint__seed2024] epoch  3/20 valid_macro_f1=0.5263  <- best
+[placeholder__project_disjoint__seed2024] epoch  4/20 valid_macro_f1=0.6690  <- best
+[placeholder__project_disjoint__seed2024] epoch  5/20 valid_macro_f1=0.6606
+[placeholder__project_disjoint__seed2024] epoch  6/20 valid_macro_f1=0.6123
+[placeholder__project_disjoint__seed2024] epoch  7/20 valid_macro_f1=0.5881
+[placeholder__project_disjoint__seed2024] epoch  8/20 valid_macro_f1=0.5912
+[placeholder__project_disjoint__seed2024] epoch  9/20 valid_macro_f1=0.6067
+[placeholder__project_disjoint__seed2024] epoch 10/20 valid_macro_f1=0.5859
+[placeholder__project_disjoint__seed2024] epoch 11/20 valid_macro_f1=0.6067
+[placeholder__project_disjoint__seed2024] epoch 12/20 valid_macro_f1=0.6067
+[placeholder__project_disjoint__seed2024] early stop at epoch 12
+[placeholder__project_disjoint__seed2024] DONE macro-F1=60.50%  acc=98.07%  Conc->Async=7/17 (41.2%)  Conc-F1=51.85%
+##### placeholder / same_project / seed 42
+[placeholder__same_project__seed42] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[placeholder__same_project__seed42] epoch  1/20 valid_macro_f1=0.2502  <- best
+[placeholder__same_project__seed42] epoch  2/20 valid_macro_f1=0.3381  <- best
+[placeholder__same_project__seed42] epoch  3/20 valid_macro_f1=0.5755  <- best
+[placeholder__same_project__seed42] epoch  4/20 valid_macro_f1=0.6563  <- best
+[placeholder__same_project__seed42] epoch  5/20 valid_macro_f1=0.6000
+[placeholder__same_project__seed42] epoch  6/20 valid_macro_f1=0.6625  <- best
+[placeholder__same_project__seed42] epoch  7/20 valid_macro_f1=0.6386
+[placeholder__same_project__seed42] epoch  8/20 valid_macro_f1=0.6386
+[placeholder__same_project__seed42] epoch  9/20 valid_macro_f1=0.6707  <- best
+[placeholder__same_project__seed42] epoch 10/20 valid_macro_f1=0.6180
+[placeholder__same_project__seed42] epoch 11/20 valid_macro_f1=0.6132
+[placeholder__same_project__seed42] epoch 12/20 valid_macro_f1=0.6132
+[placeholder__same_project__seed42] epoch 13/20 valid_macro_f1=0.6132
+[placeholder__same_project__seed42] epoch 14/20 valid_macro_f1=0.6132
+[placeholder__same_project__seed42] epoch 15/20 valid_macro_f1=0.6132
+[placeholder__same_project__seed42] epoch 16/20 valid_macro_f1=0.6284
+[placeholder__same_project__seed42] epoch 17/20 valid_macro_f1=0.6132
+[placeholder__same_project__seed42] early stop at epoch 17
+[placeholder__same_project__seed42] DONE macro-F1=59.22%  acc=98.17%  Conc->Async=10/17 (58.8%)  Conc-F1=20.00%
+##### placeholder / same_project / seed 1337
+[placeholder__same_project__seed1337] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[placeholder__same_project__seed1337] epoch  1/20 valid_macro_f1=0.3809  <- best
+[placeholder__same_project__seed1337] epoch  2/20 valid_macro_f1=0.5167  <- best
+[placeholder__same_project__seed1337] epoch  3/20 valid_macro_f1=0.6212  <- best
+[placeholder__same_project__seed1337] epoch  4/20 valid_macro_f1=0.6565  <- best
+[placeholder__same_project__seed1337] epoch  5/20 valid_macro_f1=0.7068  <- best
+[placeholder__same_project__seed1337] epoch  6/20 valid_macro_f1=0.6765
+[placeholder__same_project__seed1337] epoch  7/20 valid_macro_f1=0.6806
+[placeholder__same_project__seed1337] epoch  8/20 valid_macro_f1=0.6746
+[placeholder__same_project__seed1337] epoch  9/20 valid_macro_f1=0.6622
+[placeholder__same_project__seed1337] epoch 10/20 valid_macro_f1=0.6622
+[placeholder__same_project__seed1337] epoch 11/20 valid_macro_f1=0.6746
+[placeholder__same_project__seed1337] epoch 12/20 valid_macro_f1=0.6622
+[placeholder__same_project__seed1337] epoch 13/20 valid_macro_f1=0.6556
+[placeholder__same_project__seed1337] early stop at epoch 13
+[placeholder__same_project__seed1337] DONE macro-F1=64.11%  acc=98.12%  Conc->Async=13/17 (76.5%)  Conc-F1=16.00%
+##### placeholder / same_project / seed 2024
+[placeholder__same_project__seed2024] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[placeholder__same_project__seed2024] epoch  1/20 valid_macro_f1=0.2473  <- best
+[placeholder__same_project__seed2024] epoch  2/20 valid_macro_f1=0.5060  <- best
+[placeholder__same_project__seed2024] epoch  3/20 valid_macro_f1=0.5060
+[placeholder__same_project__seed2024] epoch  4/20 valid_macro_f1=0.5946  <- best
+[placeholder__same_project__seed2024] train 5114 -> rebalanced 1600 {0: 160, 1: 160, 2: 160, 3: 160, 4: 160, 5: 800} | valid 1279 | test 2181
+[placeholder__same_project__seed2024] epoch  1/20 valid_macro_f1=0.2473  <- best
+[placeholder__same_project__seed2024] epoch  2/20 valid_macro_f1=0.5060  <- best
+[placeholder__same_project__seed2024] epoch  3/20 valid_macro_f1=0.5060
+[placeholder__same_project__seed2024] epoch  4/20 valid_macro_f1=0.5946  <- best
+[placeholder__same_project__seed2024] epoch  5/20 valid_macro_f1=0.6486  <- best
+[placeholder__same_project__seed2024] epoch  6/20 valid_macro_f1=0.5771
+[placeholder__same_project__seed2024] epoch  7/20 valid_macro_f1=0.6174
+[placeholder__same_project__seed2024] epoch  8/20 valid_macro_f1=0.6337
+[placeholder__same_project__seed2024] epoch  9/20 valid_macro_f1=0.6584  <- best
+[placeholder__same_project__seed2024] epoch 10/20 valid_macro_f1=0.6312
+[placeholder__same_project__seed2024] epoch 11/20 valid_macro_f1=0.6424
+[placeholder__same_project__seed2024] epoch 12/20 valid_macro_f1=0.6515
+[placeholder__same_project__seed2024] epoch 13/20 valid_macro_f1=0.6320
+[placeholder__same_project__seed2024] epoch 14/20 valid_macro_f1=0.6515
+[placeholder__same_project__seed2024] epoch 15/20 valid_macro_f1=0.6312
+[placeholder__same_project__seed2024] epoch 16/20 valid_macro_f1=0.6424
+[placeholder__same_project__seed2024] epoch 17/20 valid_macro_f1=0.6627  <- best
+[placeholder__same_project__seed2024] epoch 18/20 valid_macro_f1=0.6627
+[placeholder__same_project__seed2024] epoch 19/20 valid_macro_f1=0.6627
+[placeholder__same_project__seed2024] epoch 20/20 valid_macro_f1=0.6431
+[placeholder__same_project__seed2024] DONE macro-F1=66.10%  acc=98.44%  Conc->Async=13/17 (76.5%)  Conc-F1=28.57%

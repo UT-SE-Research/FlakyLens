@@ -1,0 +1,27 @@
+CUE-FREE RATE BY CLASS (no concurrency cue anywhere in the test method text)
+class                       total  cue-free       %
+Async Wait                     76        26   34.2%
+Concurrency                    37         7   18.9%
+Time                           33        26   78.8%
+Unordered Collections          41        37   90.2%
+Test Order Dependency          93        83   89.2%
+Non-flaky                    8294      7461   90.0%
+
+CONCURRENCY: 7/37 cue-free (18.9%)
+
+All 7 cue-free Concurrency tests:
+#   project                           test_name                                             chars
+0   opensearch-project_OpenSearch     testReplicaThreadedThroughputDegradationAndRejectio    1536
+1   apache_ignite                     GridCacheRebalancingWithAsyncClearingTest.testCorre    1084
+2   apache_pulsar                     PrometheusMetricsTest.testPerTopicStats                6611
+3   apache_cassandra                  testWithMismatchingPending                             1347
+4   neo4j_neo4j                       schema.IndexPopulationIT.shutdownDatabaseDuringInde     810
+5   apache_kafka                      testForceMetadataRefreshForPatternSubscriptionDurin    1474
+6   cdapio_cdap                       TestFrameworkTestRun.testAppWithServices               4354
+
+
+ARTIFACT CONTENT CHECK - is surrounding code available?
+  FlakeBench_dataset.csv columns : ['id', 'project', 'test_name', 'full_code', 'label', 'category']
+  filtered_tests_with_owner_sha  : ['apache/hadoop', 'cceb68ffeaebe31c11012faa294fe027d04706a8;5537c6b23430285ebee33c6d9b69d3ec1e9b17b1;14cd969b6ea1898e9db6eeb9ea5292ec4558a706'] (97 rows)
+  -> full_code contains ONLY the test method body; no setup/teardown, no class fields,
+     no helper methods, no code under test.

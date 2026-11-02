@@ -1,0 +1,41 @@
+case,target,token,attribution,tag
+0,Async Wait,Eventually,3.725290298461914e-09,time
+0,Async Wait,Robust,2.0372681319713593e-09,-
+0,Async Wait,Wrapper,1.280568540096283e-09,-
+0,Async Wait,cheduler,1.2514647096395493e-09,-
+0,Async Wait,should,1.2223608791828156e-09,-
+2,Async Wait,entries,2.3283064365386963e-09,-
+2,Async Wait,Thread,1.862645149230957e-09,CONC
+2,Async Wait,new,1.862645149230957e-09,-
+2,Async Wait,DBTurn,1.57160684466362e-09,-
+2,Async Wait,True,1.3969838619232178e-09,-
+16,Async Wait,Every,3.0850060284137726e-09,-
+16,Async Wait,RETRIES,2.9103830456733704e-09,-
+16,Async Wait,mock,2.561137080192566e-09,-
+16,Async Wait,never,2.0081643015146255e-09,-
+16,Async Wait,observer,1.949956640601158e-09,-
+7,Async Wait,add,1.3969838619232178e-08,-
+7,Async Wait,final,6.51925802230835e-09,-
+7,Async Wait,Thread,5.820766091346741e-09,CONC
+7,Async Wait,new,5.587935447692871e-09,-
+7,Async Wait,OSQLite,5.587935447692871e-09,-
+12,Async Wait,flush,2.3865140974521637e-09,-
+12,Async Wait,repair,1.775333657860756e-09,-
+12,Async Wait,Auto,1.6298145055770874e-09,-
+12,Async Wait,Instance,1.5133991837501526e-09,-
+12,Async Wait,KEYSPACE,1.4551915228366852e-09,-
+4,Time,Observable,5.4016709327697754e-08,-
+4,Time,Observable,4.470348358154297e-08,-
+4,Time,Observable,3.3527612686157227e-08,-
+4,Time,switch,7.450580596923828e-09,-
+4,Time,return,7.450580596923828e-09,-
+6,Time,Duration,4.889443516731262e-09,time
+6,Time,kilobytes,4.540197551250458e-09,-
+6,Time,Log,2.9103830456733704e-09,-
+6,Time,Journal,2.9103830456733704e-09,-
+6,Time,final,2.7939677238464355e-09,-
+8,Concurrency,JULogging,1.2223608791828156e-09,-
+8,Concurrency,Timeout,9.313225746154785e-10,time
+8,Concurrency,Cluster,8.731149137020111e-10,-
+8,Concurrency,start,8.149072527885437e-10,-
+8,Concurrency,fail,8.149072527885437e-10,-

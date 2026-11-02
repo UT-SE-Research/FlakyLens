@@ -1,0 +1,111 @@
+{
+  "tag": "adv4fold",
+  "fold": 1,
+  "args": {
+    "fold": 1,
+    "epochs": 20,
+    "batch_size": 8,
+    "grad_accum": 1,
+    "max_length": 512,
+    "lr": 1e-05,
+    "weight_decay": 0.01,
+    "gamma": 2.0,
+    "patience": 8,
+    "seed": 42,
+    "amp": true,
+    "tag": "adv4fold",
+    "max_train": 0,
+    "undersample_majority": 800,
+    "oversample_minority": 0,
+    "adversarial_augment": true,
+    "augment_minority": 0,
+    "valid_subsample": 0,
+    "dynamic_padding": true,
+    "base_model": "../local_models/codebert-base",
+    "resume": false
+  },
+  "best_valid_macro_f1": 0.6253968253968254,
+  "test_macro_f1": 43.94336027529147,
+  "test_per_class_f1": {
+    "Async": 35.29411764705882,
+    "Conc": 33.33333333333333,
+    "Time": 52.63157894736842,
+    "UC": 36.36363636363637,
+    "OD": 6.0606060606060606,
+    "Non-flaky": 99.97688929974579
+  },
+  "epochs_run": 14,
+  "train_minutes": 10.97,
+  "history": [
+    {
+      "epoch": 1,
+      "valid_macro_f1": 0.2799749923248207,
+      "train_s": 40.2
+    },
+    {
+      "epoch": 2,
+      "valid_macro_f1": 0.5628372052788275,
+      "train_s": 40.2
+    },
+    {
+      "epoch": 3,
+      "valid_macro_f1": 0.5962290527507919,
+      "train_s": 40.4
+    },
+    {
+      "epoch": 4,
+      "valid_macro_f1": 0.5886821511821512,
+      "train_s": 40.3
+    },
+    {
+      "epoch": 5,
+      "valid_macro_f1": 0.6017429193899783,
+      "train_s": 40.3
+    },
+    {
+      "epoch": 6,
+      "valid_macro_f1": 0.6253968253968254,
+      "train_s": 40.4
+    },
+    {
+      "epoch": 7,
+      "valid_macro_f1": 0.6232846902201742,
+      "train_s": 40.3
+    },
+    {
+      "epoch": 8,
+      "valid_macro_f1": 0.6039094948324157,
+      "train_s": 40.3
+    },
+    {
+      "epoch": 9,
+      "valid_macro_f1": 0.6039094948324157,
+      "train_s": 40.3
+    },
+    {
+      "epoch": 10,
+      "valid_macro_f1": 0.6169015690567415,
+      "train_s": 40.3
+    },
+    {
+      "epoch": 11,
+      "valid_macro_f1": 0.6039094948324157,
+      "train_s": 40.3
+    },
+    {
+      "epoch": 12,
+      "valid_macro_f1": 0.6017429193899783,
+      "train_s": 40.3
+    },
+    {
+      "epoch": 13,
+      "valid_macro_f1": 0.6039094948324157,
+      "train_s": 40.3
+    },
+    {
+      "epoch": 14,
+      "valid_macro_f1": 0.6017429193899783,
+      "train_s": 40.3
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+CHECK 1  concurrency/wait vocabulary preserved
+   occurrences kept: 2632   tests losing any: 3/8508
+   examples: [('76955', 1, 0), ('77581', 3, 1), ('112142', 2, 1)]
+
+CHECK 2  tests containing their own project-name token
+   original: 2484/8508 (29.2%)   placeholder: 1373/8508 (16.1%)
+
+CHECK 3  ids/labels/projects identical across the two files: True
+
+CHECK 4  distinct CamelCase identifiers across corpus: original=7835  placeholder=2357  (69.9% removed)
+
+replacements per test by class:
+   Async Wait               n=  76  mean   74.5  max   366
+   Concurrency              n=  37  mean   78.8  max   381
+   Time                     n=  33  mean   56.6  max   225
+   Unordered Collections    n=  41  mean   45.1  max   146
+   Test Order Dependency    n=  93  mean   32.0  max   203
+   Non-flaky                n=8294  mean   30.2  max  1383

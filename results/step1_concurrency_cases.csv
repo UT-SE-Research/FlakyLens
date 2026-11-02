@@ -1,0 +1,391 @@
+id,project,test_name,full_code,label,category,pred,pred_name,p_conc,p_pred
+2,neo4j_neo4j,RobustJobSchedulerWrapperTest.shouldBeAbleToCancelJob,"@Test
+public void shouldBeAbleToCancelJob() throws Exception {
+    RobustJobSchedulerWrapper robustWrapper = new RobustJobSchedulerWrapper(actualScheduler, log);
+    AtomicInteger count = new AtomicInteger();
+    JobHandle jobHandle = robustWrapper.scheduleRecurring(""JobName"", 1, count::incrementAndGet);
+    assertEventually(""run count"", count::get, Matchers.greaterThanOrEqualTo(100), DEFAULT_TIMEOUT_MS, MILLISECONDS);
+    robustWrapper.cancelAndWaitTermination(jobHandle);
+    int finalCount = count.get();
+    Thread.sleep(50);
+    assertEquals(finalCount, count.get());
+}",concurrency,1,0,Async Wait,0.0116199935,0.9457268
+14,neo4j_neo4j,RobustJobSchedulerWrapperTest.recurringJobWithExceptionShouldKeepRunning,"@Test
+public void recurringJobWithExceptionShouldKeepRunning() throws Exception
+{
+    RobustJobSchedulerWrapper robustWrapper = new RobustJobSchedulerWrapper( actualScheduler, log );
+    AtomicInteger count = new AtomicInteger();
+    IllegalStateException e = new IllegalStateException();
+    int nRuns = 100;
+    JobHandle jobHandle = robustWrapper.scheduleRecurring( ""JobName"", 1, () -> {
+        if ( count.get() < nRuns )
+        {
+            count.incrementAndGet();
+            throw e;
+        }
+    }
+    );
+    assertEventually( ""run count"", count::get, Matchers.equalTo( nRuns ), DEFAULT_TIMEOUT_MS , MILLISECONDS );
+    robustWrapper.cancelAndWaitTermination( jobHandle );
+    verify( log, timeout( DEFAULT_TIMEOUT_MS ).times( nRuns ) ).warn( ""Uncaught exception"", e );
+}",concurrency,1,0,Async Wait,0.016663542,0.95705324
+33,apache_kafka,shouldTogglePrepareForBulkLoadDuringRestoreCalls,"@Test
+public void shouldTogglePrepareForBulkLoadDuringRestoreCalls() throws Exception {
+    final List<KeyValue<byte[], byte[]>> entries = new ArrayList<>();
+    entries.add(new KeyValue<>(""1"".getBytes(""UTF-8""), ""a"".getBytes(""UTF-8"")));
+    entries.add(new KeyValue<>(""2"".getBytes(""UTF-8""), ""b"".getBytes(""UTF-8"")));
+    entries.add(new KeyValue<>(""3"".getBytes(""UTF-8""), ""c"".getBytes(""UTF-8"")));
+    final AtomicReference<Exception> conditionNotMet = new AtomicReference<>();
+    final AtomicInteger conditionCheckCount = new AtomicInteger();
+    Thread conditionCheckThread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            assertRocksDBTurnsOnBulkLoading(conditionCheckCount, conditionNotMet);
+            assertRockDBTurnsOffBulkLoad(conditionCheckCount, conditionNotMet);
+        }
+    });
+    subject.init(context, subject);
+    conditionCheckThread.start();
+    context.restore(subject.name(), entries);
+    conditionCheckThread.join(2000);
+    assertTrue(conditionNotMet.get() == null);
+    assertTrue(conditionCheckCount.get() == 2);
+}",concurrency,1,0,Async Wait,0.014934945,0.941872
+49,opensearch-project_OpenSearch,testReplicaThreadedThroughputDegradationAndRejection,"@Test
+public void testReplicaThreadedThroughputDegradationAndRejection() throws Exception {
+    Settings settings = Settings.builder().put(IndexingPressure.MAX_INDEXING_BYTES.getKey(), ""10KB"")
+    .put(ShardIndexingPressureSettings.SHARD_INDEXING_PRESSURE_ENABLED.getKey(), true)
+    .put(ShardIndexingPressureSettings.SHARD_INDEXING_PRESSURE_ENFORCED.getKey(), true)
+    .put(ShardIndexingPressureMemoryManager.THROUGHPUT_DEGRADATION_LIMITS.getKey(), 1)
+    .put(ShardIndexingPressureSettings.REQUEST_SIZE_WINDOW.getKey(), 100)
+    .build();
+    final int NUM_THREADS = scaledRandomIntBetween(100, 120);
+    ShardIndexingPressure shardIndexingPressure = new ShardIndexingPressure(settings, clusterService);
+    Index index = new Index(""IndexName"", ""UUID"");
+    ShardId shardId1 = new ShardId(index, 0);
+    fireConcurrentAndParallelRequestsForUniformThroughPut(NUM_THREADS, shardIndexingPressure, shardId1, 100, 100,
+    OperationType.REPLICA);
+    fireAllThenCompleteConcurrentRequestsWithUniformDelay(ShardIndexingPressureSettings.REQUEST_SIZE_WINDOW.get(settings),
+    shardIndexingPressure, shardId1, 100, 200, OperationType.REPLICA);
+    expectThrows(OpenSearchRejectedExecutionException.class,
+    () -> shardIndexingPressure.markReplicaOperationStarted(shardId1, 11 * 1024, false));
+    assertEquals(0, shardIndexingPressure.coldStats().getIndexingPressureShardStats(shardId1).getCurrentReplicaBytes());
+    assertEquals(15, shardIndexingPressure.coldStats().getIndexingPressureShardStats(shardId1).getCurrentReplicaLimits());
+}",concurrency,1,0,Async Wait,0.016242426,0.88159347
+115,ReactiveX_RxJava,ObservableSwitchTest.outerInnerErrorRace,"@Test
+public void outerInnerErrorRace() {
+    for (int i = 0; i < 500; i++) {
+        List<Throwable> errors = TestHelper.trackPluginErrors();
+        try {
+            final PublishSubject<Integer> ps1 = PublishSubject.create();
+            final PublishSubject<Integer> ps2 = PublishSubject.create();
+            ps1.switchMap(new Function<Integer, ObservableSource<Integer>>() {
+                @Override
+                public ObservableSource<Integer> apply(Integer v) throws Exception {
+                    if (v == 1) {
+                        return ps2;
+                    }
+                    return Observable.never();
+                }
+            })
+            .test();
+            final TestException ex1 = new TestException();
+            Runnable r1 = new Runnable() {
+                @Override
+                public void run() {
+                    ps1.onError(ex1);
+                }
+            };
+            final TestException ex2 = new TestException();
+            Runnable r2 = new Runnable() {
+                @Override
+                public void run() {
+                    ps2.onError(ex2);
+                }
+            };
+            TestHelper.race(r1, r2);
+            for (Throwable e : errors) {
+                assertTrue(e.toString(), e instanceof TestException);
+            }
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+}",concurrency,1,2,Time,0.014281181,0.4143902
+128,neo4j_neo4j,createdWorkerThreadsShouldContainConnectorName,"@Test
+public void createdWorkerThreadsShouldContainConnectorName() throws Exception
+{
+    AtomicInteger processNextBatchCount = new AtomicInteger();
+    AtomicReference<Thread> poolThread = new AtomicReference<>();
+    AtomicReference<String> poolThreadName = new AtomicReference<>();
+    String id = UUID.randomUUID().toString();
+    BoltConnection connection = newConnection( id );
+    when( connection.processNextBatch() ).thenAnswer( inv ->
+    {
+        poolThread.set( Thread.currentThread() );
+        poolThreadName.set( Thread.currentThread().getName() );
+        processNextBatchCount.incrementAndGet();
+        return true;
+    } );
+    boltScheduler.start();
+    boltScheduler.created( connection );
+    boltScheduler.enqueued( connection, Jobs.noop() );
+    Predicates.await( () -> processNextBatchCount.get() > 0, 1, MINUTES );
+    assertThat( poolThread.get().getName(), not( equalTo( poolThreadName.get() ) ) );
+    assertThat( poolThread.get().getName(), containsString( String.format( ""[%s]"", CONNECTOR_KEY ) ) );
+    assertThat( poolThread.get().getName(), not( containsString( String.format( ""[%s]"", connection.remoteAddress() ) ) ) );
+}",concurrency,1,0,Async Wait,0.028618753,0.9453624
+136,graylog2_graylog2-server,KafkaJournalTest.serverStatusUnthrottledIfJournalUtilizationIsLowerThanThreshold,"@Test
+public void serverStatusUnthrottledIfJournalUtilizationIsLowerThanThreshold() throws Exception {
+    serverStatus.throttle();
+    final Size segmentSize = Size.kilobytes(1L);
+    final KafkaJournal journal = new KafkaJournal(journalDirectory, scheduler, segmentSize, Duration.standardSeconds(1L), Size.kilobytes(4L), Duration.standardSeconds(1L), 1000000, Duration.standardSeconds(1L), 90, new MetricRegistry(), serverStatus);
+    journal.flushDirtyLogs();
+    journal.cleanupLogs();
+    assertThat(serverStatus.getLifecycle()).isEqualTo(RUNNING);
+}",concurrency,1,2,Time,0.009921275,0.74589795
+163,pushtorefresh_storio,NotifyAboutChangesTest.notifyAboutChangesConcurrently,"@Test
+public void notifyAboutChangesConcurrently() {
+    final int numberOfThreads = 100;
+    final TestSubscriber<Changes> testSubscriber = new TestSubscriber<Changes>();
+    final Set<String> tables = new HashSet<String>();
+    final List<Changes> expectedChanges = new ArrayList<Changes>();
+    for (int i = 0; i < numberOfThreads; i++) {
+        final String table = ""test_table"" + i;
+        tables.add(table);
+        expectedChanges.add(Changes.newInstance(table));
+    }
+    storIOSQLite.observeChanges(LATEST).subscribe(testSubscriber);
+    final CountDownLatch startAllThreadsLock = new CountDownLatch(1);
+    for (int i = 0; i < numberOfThreads; i++) {
+        final int finalI = i;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    startAllThreadsLock.await();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                storIOSQLite.lowLevel().notifyAboutChanges(Changes.newInstance(""test_table"" + finalI));
+            }
+        }).start();
+    }
+    startAllThreadsLock.countDown();
+    final long startTime = SystemClock.elapsedRealtime();
+    while ((testSubscriber.valueCount() != tables.size()) && ((SystemClock.elapsedRealtime() - startTime) < 20000)) {
+        Thread.yield();
+    }
+    testSubscriber.assertNoErrors();
+    testSubscriber.assertValueCount(expectedChanges.size());
+    assertThat(expectedChanges.containsAll(testSubscriber.values())).isTrue();
+}",concurrency,1,0,Async Wait,0.12363004,0.8346633
+215,neo4j_neo4j,shouldPickANewServerToWriteToOnLeaderSwitch,"@Test
+public void shouldPickANewServerToWriteToOnLeaderSwitch() throws Throwable
+{
+    cluster = clusterRule.withNumberOfEdgeMembers( 0 ).startCluster();
+    CoreClusterMember leader = cluster.awaitLeader();
+    CountDownLatch startTheLeaderSwitching = new CountDownLatch( 1 );
+    Thread thread = new Thread( () ->
+    {
+        try
+        {
+            startTheLeaderSwitching.await();
+            CoreClusterMember theLeader = cluster.awaitLeader();
+            switchLeader( theLeader );
+        }
+        catch ( TimeoutException | InterruptedException e )
+        {
+        }
+    } );
+    thread.start();
+    Config config = Config.build().withLogging( new JULogging( Level.OFF ) ).toConfig();
+    try ( Driver driver = GraphDatabase
+    .driver( leader.routingURI(), AuthTokens.basic( ""neo4j"", ""neo4j"" ), config ) )
+    {
+        boolean success = false;
+        Set<BoltServerAddress> seenAddresses = new HashSet<>();
+        long deadline = System.currentTimeMillis() + (30 * 1000);
+        while ( !success )
+        {
+            if ( System.currentTimeMillis() > deadline )
+            {
+                fail( ""Failed to write to the new leader in time"" );
+            }
+            try ( Session session = driver.session( AccessMode.WRITE ) )
+            {
+                startTheLeaderSwitching.countDown();
+                BoltServerAddress boltServerAddress = ((RoutingNetworkSession) session).address();
+                seenAddresses.add( boltServerAddress );
+                session.run( ""CREATE (p:Person)"" );
+                success = seenAddresses.size() >= 2;
+            }
+            catch ( Exception e )
+            {
+                Thread.sleep( 100 );
+            }
+        }
+    }
+    finally
+    {
+        thread.join();
+    }
+}",concurrency,1,1,Concurrency,0.6196161,0.6196161
+219,graylog2_graylog2-server,KafkaJournalTest.serverStatusThrottledIfJournalUtilizationIsHigherThanThreshold,"@Test
+public void serverStatusThrottledIfJournalUtilizationIsHigherThanThreshold() throws Exception {
+    serverStatus.running();
+    final Size segmentSize = Size.kilobytes(1L);
+    final KafkaJournal journal = new KafkaJournal(journalDirectory, scheduler, segmentSize, Duration.standardSeconds(1L), Size.kilobytes(4L), Duration.standardSeconds(1L), 1000000, Duration.standardSeconds(1L), 90, new MetricRegistry(), serverStatus);
+    createBulkChunks(journal, segmentSize, 4);
+    journal.flushDirtyLogs();
+    journal.cleanupLogs();
+    assertThat(serverStatus.getLifecycle()).isEqualTo(THROTTLED);
+}",concurrency,1,2,Time,0.0142864315,0.54731196
+253,neo4j_neo4j,RobustJobSchedulerWrapperTest.recurringJobWithErrorShouldStop,"@Test
+public void recurringJobWithErrorShouldStop() throws Exception
+{
+    RobustJobSchedulerWrapper robustWrapper = new RobustJobSchedulerWrapper( actualScheduler, log );
+    AtomicInteger count = new AtomicInteger();
+    Error e = new Error();
+    JobHandle jobHandle = robustWrapper.scheduleRecurring( ""JobName"", 1, () ->{
+        count.incrementAndGet();
+        throw e;
+    }
+    );
+    Thread.sleep( 50 );
+    assertEventually( ""run count"", count::get, Matchers.equalTo( 1 ), DEFAULT_TIMEOUT_MS , MILLISECONDS );
+    robustWrapper.cancelAndWaitTermination( jobHandle );
+    verify( log, timeout( DEFAULT_TIMEOUT_MS ).times( 1 ) ).error( ""Uncaught error rethrown"", e );
+}",concurrency,1,0,Async Wait,0.0134905595,0.95860493
+271,ReactiveX_RxJava,TestSchedulers.testSchedulingWithDueTime,"@Test
+public void testSchedulingWithDueTime() throws InterruptedException {
+    final CountDownLatch latch = new CountDownLatch(5);
+    final AtomicInteger counter = new AtomicInteger();
+    long start = System.currentTimeMillis();
+    Schedulers.threadPoolForComputation().schedule(null, new Func2<Scheduler, String, Subscription>() {
+        @Override
+        public Subscription call(Scheduler scheduler, String state) {
+            System.out.println(""doing work"");
+            latch.countDown();
+            counter.incrementAndGet();
+            if (latch.getCount() == 0) {
+                return Subscriptions.empty();
+            } else {
+                return scheduler.schedule(state, this, new Date(System.currentTimeMillis() + 50));
+            }
+        }
+    }, new Date(System.currentTimeMillis() + 100));
+    if (!latch.await(3000, TimeUnit.MILLISECONDS)) {
+        fail(""didn't execute ... timed out"");
+    }
+    long end = System.currentTimeMillis();
+    assertEquals(5, counter.get());
+    if ((end - start) < 250) {
+        fail(""it should have taken over 250ms since each step was scheduled 50ms in the future"");
+    }
+}",concurrency,1,2,Time,0.035770714,0.68271136
+284,apache_cassandra,testWithMismatchingPending,"@Test
+public void testWithMismatchingPending() throws Throwable
+{
+    try(Cluster cluster = init(Cluster.build(2).withConfig(config -> config.with(GOSSIP).with(NETWORK)).start()))
+    {
+        cluster.schemaChange(""create table "" + KEYSPACE + "".tbl (id int primary key, t int)"");
+        insert(cluster.coordinator(1), 0, 100);
+        cluster.forEach((node) -> node.flush(KEYSPACE));
+        cluster.get(1).callOnInstance(repair(options(false)));
+        insert(cluster.coordinator(1), 100, 100);
+        cluster.forEach((node) -> node.flush(KEYSPACE));
+        cluster.forEach((node) -> node.runOnInstance(() -> {
+            ColumnFamilyStore cfs = Keyspace.open(KEYSPACE).getColumnFamilyStore(""tbl"");
+            FBUtilities.waitOnFutures(CompactionManager.instance.submitBackground(cfs));
+            cfs.disableAutoCompaction();
+        }));
+        cluster.get(1).callOnInstance(repair(options(false)));
+        cluster.get(1).runOnInstance(() -> {
+            ColumnFamilyStore cfs = Keyspace.open(KEYSPACE).getColumnFamilyStore(""tbl"");
+            cfs.enableAutoCompaction();
+            FBUtilities.waitOnFutures(CompactionManager.instance.submitBackground(cfs));
+        });
+        RepairResult rs = cluster.get(1).callOnInstance(repair(options(true)));
+        assertTrue(rs.success);
+        assertFalse(rs.wasInconsistent);
+    }
+}",concurrency,1,0,Async Wait,0.114262246,0.85073113
+285,neo4j_neo4j,shouldBuildUpGracefullyUntilReachedMinPoolSize,"@Test
+public void shouldBuildUpGracefullyUntilReachedMinPoolSize() throws InterruptedException
+{
+    StatefulMonitor stateMonitor = new StatefulMonitor();
+    FakeClock clock = new FakeClock();
+    final LinkedQueuePool<Object> pool = getLinkedQueuePool( stateMonitor, clock, 5 );
+    ExecutorService executor = Executors.newCachedThreadPool();
+    List<FlyweightHolder<Object>> flyweightHolders = acquireFromPool( pool, 5, executor );
+    executor.shutdown();
+    for ( FlyweightHolder<Object> flyweightHolder : flyweightHolders )
+    {
+        flyweightHolder.release();
+    }
+    executor.awaitTermination( 10, TimeUnit.SECONDS );
+    assertEquals( -1, stateMonitor.currentPeakSize.get() );
+    assertEquals( -1, stateMonitor.targetSize.get() );
+    assertEquals( 0, stateMonitor.disposed.get() );
+}",concurrency,1,0,Async Wait,0.010126641,0.9510276
+293,neo4j_neo4j,schema.IndexPopulationIT.shutdownDatabaseDuringIndexPopulations,"@Test
+public void shutdownDatabaseDuringIndexPopulations() {
+    AssertableLogProvider assertableLogProvider = new AssertableLogProvider(true);
+    File storeDir = directory.directory(""shutdownDbTest"");
+    Label testLabel = Label.label(""testLabel"");
+    String propertyName = ""testProperty"";
+    GraphDatabaseService shutDownDb = new TestGraphDatabaseFactory().setInternalLogProvider(assertableLogProvider).newEmbeddedDatabase(storeDir);
+    prePopulateDatabase(shutDownDb, testLabel, propertyName);
+    try (final Transaction transaction = shutDownDb.beginTx()) {
+        shutDownDb.schema().indexFor(testLabel).on(propertyName).create();
+        transaction.success();
+    }
+    shutDownDb.shutdown();
+    assertableLogProvider.assertNone(AssertableLogProvider.inLog(IndexPopulationJob.class).anyError());
+}",concurrency,1,0,Async Wait,0.013418506,0.6471974
+309,apache_kafka,testForceMetadataRefreshForPatternSubscriptionDuringRebalance,"@Test
+public void testForceMetadataRefreshForPatternSubscriptionDuringRebalance() {
+    final String consumerId = ""consumer"";
+    subscriptions.subscribe(Pattern.compile("".*""), rebalanceListener);
+    client.updateMetadata(TestUtils.metadataUpdateWith(1, singletonMap(topic1, 1)));
+    assertEquals(singleton(topic1), subscriptions.subscription());
+    client.prepareResponse(groupCoordinatorResponse(node, Errors.NONE));
+    coordinator.ensureCoordinatorReady(time.timer(Long.MAX_VALUE));
+    client.prepareMetadataUpdate(metadataResponse);
+    client.prepareResponse(joinGroupFollowerResponse(1, consumerId, ""leader"", Errors.NONE));
+    client.prepareResponse(new MockClient.RequestMatcher() {
+        @Override
+        public boolean matches(AbstractRequest body) {
+            SyncGroupRequest sync = (SyncGroupRequest) body;
+            return sync.memberId().equals(consumerId) &&
+            sync.generationId() == 1 &&
+            sync.groupAssignment().isEmpty();
+        }
+    }, syncGroupResponse(singletonList(t1p), Errors.NONE));
+    partitionAssignor.prepare(singletonMap(consumerId, singletonList(t1p)));
+    coordinator.poll(time.timer(Long.MAX_VALUE));
+    final Set<String> updatedSubscriptionSet = new HashSet<>(Arrays.asList(topic1, topic2));
+    assertEquals(updatedSubscriptionSet, subscriptions.subscription());
+    metadata.requestUpdate();
+    client.poll(Long.MAX_VALUE, time.milliseconds());
+    assertFalse(coordinator.rejoinNeededOrPending());
+}",concurrency,1,0,Async Wait,0.010673377,0.9363989
+355,ReactiveX_RxJava,OperatorRetryTest.testRetryWithBackpressure,"@Test
+public void testRetryWithBackpressure() throws InterruptedException {
+    final int NUM_RETRIES = RxRingBuffer.SIZE * 2;
+    for (int i = 0; i < 400; i++) {
+        @SuppressWarnings(""unchecked"")
+        Observer<String> observer = mock(Observer.class);
+        Observable<String> origin = Observable.create(new FuncWithErrors(NUM_RETRIES));
+        TestSubscriber<String> ts = new TestSubscriber<String>(observer);
+        origin.retry().observeOn(Schedulers.computation()).unsafeSubscribe(ts);
+        ts.awaitTerminalEvent(5, TimeUnit.SECONDS);
+        InOrder inOrder = inOrder(observer);
+        verify(observer, never()).onError(any(Throwable.class));
+        inOrder.verify(observer, times(NUM_RETRIES + 1)).onNext(""beginningEveryTime"");
+        inOrder.verify(observer, times(1)).onNext(""onSuccessOnly"");
+        inOrder.verify(observer, times(1)).onCompleted();
+        inOrder.verifyNoMoreInteractions();
+    }
+}",concurrency,1,0,Async Wait,0.014046925,0.90353864

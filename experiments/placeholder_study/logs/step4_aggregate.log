@@ -1,0 +1,124 @@
+runs loaded: 12
+
+========================================================================================================
+2x2 SUMMARY  (test set, best-epoch checkpoint, mean ± std over seeds 42/1337/2024)
+========================================================================================================
+corpus      setting             n        macro-F1        accuracy     Conc->Async          rate %         Conc F1
+original    same_project        3    64.37 ± 2.08    98.21 ± 0.05    13.67 ± 3.21   80.39 ± 18.91   24.43 ± 18.63
+original    project_disjoint    3    62.31 ± 4.26    98.21 ± 0.26    15.67 ± 0.58    92.16 ± 3.40     0.00 ± 0.00
+placeholder same_project        3    63.14 ± 3.54    98.24 ± 0.17    12.00 ± 1.73   70.59 ± 10.19    21.52 ± 6.42
+placeholder project_disjoint    3    57.24 ± 3.12    97.91 ± 0.15    11.33 ± 4.51   66.67 ± 26.52   36.37 ± 22.06
+
+========================================================================================================
+PER-CLASS F1 (mean ± std)
+========================================================================================================
+class                              orig/same           orig/proj           plac/same           plac/proj
+Async Wait                      51.50 ± 4.37        54.69 ± 1.66        57.59 ± 1.61       58.18 ± 11.13
+Concurrency                    24.43 ± 18.63         0.00 ± 0.00        21.52 ± 6.42       36.37 ± 22.06
+Time                            58.76 ± 3.65       73.06 ± 15.08        57.54 ± 0.69        41.40 ± 1.22
+Unordered Collections          65.80 ± 17.29        69.40 ± 9.53       60.00 ± 24.04       38.52 ± 10.14
+Test Order Dependency           85.77 ± 2.98        76.72 ± 6.72        82.23 ± 6.16        68.98 ± 3.07
+Non-flaky                       99.94 ± 0.03        99.99 ± 0.01        99.97 ± 0.04        99.99 ± 0.01
+
+========================================================================================================
+PER-CLASS PRECISION / RECALL (mean over seeds)
+========================================================================================================
+
+[original / same_project]   support: Async=24, Conc=17, Time=15, UC=4, OD=43, NonFl=2078
+   class                      precision      recall          f1
+   Async Wait                    39.31%      75.00%      51.50%
+   Concurrency                   40.00%      19.61%      24.43%
+   Time                          86.90%      44.44%      58.76%
+   Unordered Collections         69.84%      66.67%      65.80%
+   Test Order Dependency         93.38%      79.84%      85.77%
+   Non-flaky                     99.92%      99.95%      99.94%
+
+[original / project_disjoint]   support: Async=24, Conc=17, Time=15, UC=4, OD=43, NonFl=2078
+   class                      precision      recall          f1
+   Async Wait                    42.40%      77.78%      54.69%
+   Concurrency                    0.00%       0.00%       0.00%
+   Time                          84.87%      64.44%      73.06%
+   Unordered Collections         57.04%      91.67%      69.40%
+   Test Order Dependency         78.80%      75.19%      76.72%
+   Non-flaky                    100.00%      99.98%      99.99%
+
+[placeholder / same_project]   support: Async=24, Conc=17, Time=15, UC=4, OD=43, NonFl=2078
+   class                      precision      recall          f1
+   Async Wait                    45.33%      79.17%      57.59%
+   Concurrency                   55.56%      13.73%      21.52%
+   Time                          92.59%      42.22%      57.54%
+   Unordered Collections         49.37%      83.33%      60.00%
+   Test Order Dependency         83.93%      80.62%      82.23%
+   Non-flaky                     99.98%      99.95%      99.97%
+
+[placeholder / project_disjoint]   support: Async=24, Conc=17, Time=15, UC=4, OD=43, NonFl=2078
+   class                      precision      recall          f1
+   Async Wait                    45.06%      83.33%      58.18%
+   Concurrency                   78.89%      27.45%      36.37%
+   Time                          93.33%      26.67%      41.40%
+   Unordered Collections         25.58%      91.67%      38.52%
+   Test Order Dependency         83.80%      58.91%      68.98%
+   Non-flaky                    100.00%      99.98%      99.99%
+
+========================================================================================================
+CONFUSION MATRICES (summed over the 3 seeds; rows=true, cols=pred)
+========================================================================================================
+
+[original / same_project]
+             Async    Conc    Time      UC      OD   NonFl
+    Async       54      11       3       1       0       3
+     Conc       41      10       0       0       0       0
+     Time       17       2      20       2       4       0
+       UC        3       0       0       8       1       0
+       OD       22       0       0       2     103       2
+    NonFl        0       0       0       0       3    6231
+
+[original / project_disjoint]
+             Async    Conc    Time      UC      OD   NonFl
+    Async       56       0       2       0      14       0
+     Conc       47       0       0       0       4       0
+     Time       10       0      29       0       6       0
+       UC        0       0       0      11       1       0
+       OD       20       0       3       9      97       0
+    NonFl        0       0       0       0       1    6233
+
+[placeholder / same_project]
+             Async    Conc    Time      UC      OD   NonFl
+    Async       57       5       2       1       7       0
+     Conc       36       7       0       3       5       0
+     Time       13       1      19       4       8       0
+       UC        2       0       0      10       0       0
+       OD       18       2       0       4     104       1
+    NonFl        0       0       0       3       0    6231
+
+[placeholder / project_disjoint]
+             Async    Conc    Time      UC      OD   NonFl
+    Async       60       1       1       2       8       0
+     Conc       34      14       0       2       1       0
+     Time       18       5      12       5       5       0
+       UC        1       0       0      11       0       0
+       OD       24       0       0      29      76       0
+    NonFl        0       0       0       0       1    6233
+
+========================================================================================================
+KEY CONTRASTS (macro-F1 / Conc->Async rate / Concurrency F1)
+========================================================================================================
+   ORIGINAL: same-project minus project-disjoint       macro-F1               +2.06   (±2.73 SE)
+   ORIGINAL: same-project minus project-disjoint       Conc->Async rate      -11.76   (±11.09 SE)
+   ORIGINAL: same-project minus project-disjoint       Concurrency F1        +24.43   (±10.76 SE)
+
+   PROJECT-DISJOINT: placeholder minus original        macro-F1               -5.07   (±3.05 SE)
+   PROJECT-DISJOINT: placeholder minus original        Conc->Async rate      -25.49   (±15.44 SE)
+   PROJECT-DISJOINT: placeholder minus original        Concurrency F1        +36.37   (±12.74 SE)
+
+   SAME-PROJECT: placeholder minus original            macro-F1               -1.22   (±2.37 SE)
+   SAME-PROJECT: placeholder minus original            Conc->Async rate       -9.80   (±12.40 SE)
+   SAME-PROJECT: placeholder minus original            Concurrency F1         -2.91   (±11.38 SE)
+
+========================================================================================================
+LAST-EPOCH CROSS-CHECK (macro-F1 / Concurrency F1), guards against selection artefacts
+========================================================================================================
+   original    same_project      best     64.37 ± 2.08   last     64.57 ± 3.84   |   Conc best  24.43 ± 18.63   last   5.80 ± 10.04
+   original    project_disjoint  best     62.31 ± 4.26   last     62.24 ± 3.33   |   Conc best    0.00 ± 0.00   last    3.70 ± 6.42
+   placeholder same_project      best     63.14 ± 3.54   last     60.95 ± 4.02   |   Conc best   21.52 ± 6.42   last  16.37 ± 10.57
+   placeholder project_disjoint  best     57.24 ± 3.12   last     51.66 ± 1.26   |   Conc best  36.37 ± 22.06   last  20.56 ± 20.84

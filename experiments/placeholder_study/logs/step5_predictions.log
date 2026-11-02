@@ -1,0 +1,17 @@
+observations: 204 (17 Concurrency tests x 12 checkpoints)
+cue-free share of the fold-2 Concurrency test sets: 7/17 (project_disjoint), 5/17 (same_project)
+
+PREDICTION DISTRIBUTION, cue-free vs cue-bearing Concurrency tests (pooled over 12 checkpoints)
+group             n     Async      Conc      Time        UC        OD     NonFl   %->Async  %correct
+cue-bearing     132       101        20         0         3         8         0      76.5%     15.2%
+cue-free         72        56        12         0         2         2         0      77.8%     16.7%
+
+same, split by corpus x setting:
+  original    project_disjoint  cue-bearing  n= 30  ->Async  86.7%   correct   0.0%
+  original    project_disjoint  cue-free     n= 21  ->Async 100.0%   correct   0.0%
+  original    same_project      cue-bearing  n= 36  ->Async  72.2%   correct  27.8%
+  original    same_project      cue-free     n= 15  ->Async  93.3%   correct   6.7%
+  placeholder project_disjoint  cue-bearing  n= 30  ->Async  73.3%   correct  20.0%
+  placeholder project_disjoint  cue-free     n= 21  ->Async  57.1%   correct  38.1%
+  placeholder same_project      cue-bearing  n= 36  ->Async  75.0%   correct  11.1%
+  placeholder same_project      cue-free     n= 15  ->Async  60.0%   correct  20.0%

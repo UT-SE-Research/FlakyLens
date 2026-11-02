@@ -1,0 +1,13 @@
+fold-2 macro-F1 = 59.12% (surviving 'Balanced' checkpoint)
+CONFUSION MATRIX (rows=true, cols=pred)
+          Async   Conc   Time     UC     OD  NonFl     total
+  Async      18      0      0      0      6      0        24
+   Conc      12      1      4      0      0      0        17
+   Time       5      0      8      1      1      0        15
+     UC       0      0      0      3      1      0         4
+     OD       6      1      1      3     32      0        43
+  NonFl       0      0      0      0      0   2078      2078
+Concurrency -> Async Wait: 12/17 = 70.6%
+Concurrency -> Time      : 4/17 = 23.5%
+Concurrency correct      : 1/17 = 5.9%
+per-class F1: {'Async': 55.38, 'Conc': 10.53, 'Time': 57.14, 'UC': 54.55, 'OD': 77.11, 'NonFl': 100.0}

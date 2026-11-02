@@ -1,0 +1,10 @@
+rows: 8574
+tokenized ok      : 8568 (99.9%)
+fully parsed (AST): 8013 (93.5%)  -> rest used the positional heuristic
+identifier tokens : 333723  (38.9 per test)
+tokens replaced   : 265920  (31.0 per test, 79.7% of identifiers)
+distinct names replaced per test: 15.1
+tests left unchanged: 33
+
+wrote experiments/placeholder_study/data/FlakeBench_placeholder.csv
+wrote experiments/placeholder_study/data/mapping.jsonl

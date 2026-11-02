@@ -1,0 +1,26 @@
+=== FULL DATASET ===
+tests: 8574   projects: 98   cols: ['id', 'project', 'test_name', 'full_code', 'label', 'category']
+  0 Async Wait                  76  ( 0.89%)
+  1 Concurrency                 37  ( 0.43%)
+  2 Time                        33  ( 0.38%)
+  3 Unordered Collections       41  ( 0.48%)
+  4 Test Order Dependency       93  ( 1.08%)
+  5 Non-flaky                 8294  (96.73%)
+  flaky total: 280  (3.27%)
+
+=== PER-FOLD SPLITS ON DISK (project-disjoint by construction) ===
+fold    train  valid   test  tr_proj  te_proj  overlap
+1        5076   1269   2229       73       25        0
+2        5114   1279   2181       73       25        0
+   fold2 valid-vs-train project overlap: 71 of 71 -> validation is SAME-PROJECT
+3        5100   1275   2199       73       25        0
+4        5287   1322   1965       74       23        0
+
+=== fold-2 class distribution ===
+cls                         train  valid   test
+Async Wait                     42     10     24
+Concurrency                    16      4     17
+Time                           14      4     15
+Unordered Collections          30      7      4
+Test Order Dependency          40     10     43
+Non-flaky                    4972   1244   2078
